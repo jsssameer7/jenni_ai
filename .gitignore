@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
+
+# Environment & secrets
+.env
+
+# Data & database
+data/*.db
+data/*.db-wal
+data/*.db-shm
+data/*.wav
+data/generated_images/*
+!data/generated_images/.gitkeep
+
+# Testing & cache
+.pytest_cache/
+.coverage
+
+# IDE
+.vscode/
+.idea/

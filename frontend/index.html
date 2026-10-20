@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Jenni AI — Your Personal Assistant</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-orb">
+          <div class="orb-inner"></div>
+        </div>
+        <div class="brand-text">
+          <h1>Jenni AI</h1>
+          <span>Personal Assistant</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-tab="chat-tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Chat & Voice</span>
+        </button>
+        <button class="nav-item" data-tab="pc-tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          <span>PC Control</span>
+        </button>
+        <button class="nav-item" data-tab="memory-tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2a9 9 0 0 0-9 9c0 3.6 2.1 6.7 5.2 8.1v2.4a1 1 0 0 0 1 1h5.6a1 1 0 0 0 1-1v-2.4c3.1-1.4 5.2-4.5 5.2-8.1a9 9 0 0 0-9-9z"/><path d="M9 13h6"/></svg>
+          <span>Personal Memory</span>
+        </button>
+        <button class="nav-item" data-tab="files-tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <span>File Search</span>
+        </button>
+        <button class="nav-item" data-tab="images-tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span>Image Studio</span>
+        </button>
+        <button class="nav-item" data-tab="tasks-tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          <span>Automations</span>
+        </button>
+        <button class="nav-item" data-tab="mobile-tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          <span>Android Connect</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-status">
+        <div class="status-badge" id="ai-status-badge">
+          <span class="status-dot online"></span>
+          <span id="ai-status-text">Ollama: Ready</span>
+        </div>
+        <div class="status-badge" id="gpu-status-badge">
+          <span class="status-dot online"></span>
+          <span id="gpu-status-text">GPU: RTX 3050</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle Navigation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="page-title">
+          <h2 id="current-view-title">Jenni AI Assistant</h2>
+          <span class="version-tag">v1.0.0</span>
+        </div>
+
+        <div class="topbar-controls">
+          <!-- Spoken Audio Toggle -->
+          <button class="control-btn" id="tts-toggle-btn" title="Toggle Spoken Answers">
+            <svg id="tts-icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+            <svg id="tts-icon-off" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+            <span id="tts-label">Spoken: On</span>
+          </button>
+
+          <!-- Language Selector -->
+          <select id="voice-lang-select" class="lang-select" title="Voice Language (Configurable Indian Languages)">
+            <option value="en-US">English (US)</option>
+            <option value="en-IN" selected>English (India)</option>
+            <option value="hi-IN">Hindi (हिन्दी)</option>
+            <option value="ta-IN">Tamil (தமிழ்)</option>
+            <option value="te-IN">Telugu (తెలుగు)</option>
+            <option value="bn-IN">Bengali (বাংলা)</option>
+          </select>
+
+          <!-- Clear Chat -->
+          <button class="control-btn danger" id="clear-chat-btn" title="Clear Conversation History">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- View Containers -->
+      <div class="view-wrapper">
+
+        <!-- 1. CHAT & VOICE VIEW -->
+        <section class="tab-view active" id="chat-tab">
+          <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+              <!-- Messages will render dynamically here -->
+            </div>
+
+            <!-- Suggested Quick Actions -->
+            <div class="quick-suggestions" id="quick-suggestions">
+              <button class="suggestion-chip" data-query="Open Notepad">📝 Open Notepad</button>
+              <button class="suggestion-chip" data-query="Open Calculator">🔢 Open Calculator</button>
+              <button class="suggestion-chip" data-query="Launch VS Code">💻 Launch VS Code</button>
+              <button class="suggestion-chip" data-query="Check my system health">⚡ System Health</button>
+              <button class="suggestion-chip" data-query="Remember that I love Python and dark themes">🧠 Remember Preference</button>
+            </div>
+
+            <!-- Voice & Chat Input Area -->
+            <div class="chat-input-bar">
+              <!-- Push to Talk Mic Button -->
+              <button class="voice-btn" id="voice-record-btn" title="Push to Talk with Jenni AI">
+                <div class="mic-wave"></div>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+              </button>
+
+              <div class="input-wrapper">
+                <input type="text" id="chat-input" placeholder="Talk with Jenni AI or type a command..." autocomplete="off">
+                <button class="send-btn" id="send-btn" title="Send Message">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="voice-indicator" id="voice-indicator">
+              <span class="pulsing-dot"></span>
+              <span id="voice-status-label">Jenni AI is listening... Speak now</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. PC CONTROL VIEW -->
+        <section class="tab-view" id="pc-tab">
+          <div class="section-header">
+            <h3>Safe PC Functions & Hardware Monitor</h3>
+            <p>Control approved applications and monitor Windows 11 system metrics safely.</p>
+          </div>
+
+          <!-- Hardware Metrics Cards -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-title">CPU Utilization</div>
+              <div class="metric-val" id="metric-cpu">-- %</div>
+              <div class="progress-bar"><div class="fill" id="fill-cpu"></div></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">System RAM (16 GB)</div>
+              <div class="metric-val" id="metric-ram">-- GB</div>
+              <div class="progress-bar"><div class="fill" id="fill-ram"></div></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">GPU VRAM (RTX 3050 4GB)</div>
+              <div class="metric-val" id="metric-gpu">-- MB</div>
+              <div class="progress-bar"><div class="fill" id="fill-gpu"></div></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">C: Drive Storage</div>
+              <div class="metric-val" id="metric-disk">-- GB Free</div>
+              <div class="progress-bar"><div class="fill" id="fill-disk"></div></div>
+            </div>
+          </div>
+
+          <!-- Quick App Launchers -->
+          <div class="subsection">
+            <h4>Approved Applications</h4>
+            <div class="app-launch-grid">
+              <button class="app-card" onclick="launchApp('calculator')">
+                <div class="app-icon">🔢</div>
+                <div class="app-info"><strong>Calculator</strong><span>calc.exe</span></div>
+              </button>
+              <button class="app-card" onclick="launchApp('notepad')">
+                <div class="app-icon">📝</div>
+                <div class="app-info"><strong>Notepad</strong><span>notepad.exe</span></div>
+              </button>
+              <button class="app-card" onclick="launchApp('vscode')">
+                <div class="app-icon">💻</div>
+                <div class="app-info"><strong>VS Code</strong><span>code</span></div>
+              </button>
+              <button class="app-card" onclick="launchApp('explorer')">
+                <div class="app-icon">📁</div>
+                <div class="app-info"><strong>File Explorer</strong><span>explorer.exe</span></div>
+              </button>
+              <button class="app-card" onclick="launchApp('paint')">
+                <div class="app-icon">🎨</div>
+                <div class="app-info"><strong>Paint</strong><span>mspaint.exe</span></div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Approved Websites -->
+          <div class="subsection">
+            <h4>Approved Websites</h4>
+            <div class="website-pill-list">
+              <button class="site-pill" onclick="openWeb('https://google.com')">🌐 Google</button>
+              <button class="site-pill" onclick="openWeb('https://github.com')">🐙 GitHub</button>
+              <button class="site-pill" onclick="openWeb('https://stackoverflow.com')">💡 Stack Overflow</button>
+              <button class="site-pill" onclick="openWeb('https://python.org')">🐍 Python Docs</button>
+              <button class="site-pill" onclick="openWeb('https://youtube.com')">▶️ YouTube</button>
+            </div>
+          </div>
+
+          <!-- Audit Activity Log -->
+          <div class="subsection">
+            <h4>Recent PC Action Audit Logs</h4>
+            <div class="logs-container" id="pc-action-logs">
+              <div class="empty-state">No recent PC actions recorded.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. PERSONAL MEMORY VIEW -->
+        <section class="tab-view" id="memory-tab">
+          <div class="section-header">
+            <div class="header-split">
+              <div>
+                <h3>Persistent Personal Memory</h3>
+                <p>Jenni AI remembers your approved preferences to personalize every conversation.</p>
+              </div>
+              <div class="security-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>Zero Secrets Policy: Passwords & API Keys Strictly Blocked</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add Memory Form -->
+          <div class="memory-form-card">
+            <h4>Add New Preference</h4>
+            <div class="form-row">
+              <input type="text" id="memory-key" placeholder="Key (e.g. favorite_framework, name, coffee_order)">
+              <input type="text" id="memory-val" placeholder="Value (e.g. FastAPI, Sameer, Cappuccino)">
+              <select id="memory-cat">
+                <option value="preference">Preference</option>
+                <option value="fact">Fact</option>
+                <option value="work">Work & Coding</option>
+                <option value="custom">Custom</option>
+              </select>
+              <button class="btn primary" id="save-memory-btn">Save Memory</button>
+            </div>
+          </div>
+
+          <!-- Memory List -->
+          <div class="memory-list" id="memory-list">
+            <!-- Dynamically populated -->
+          </div>
+        </section>
+
+        <!-- 4. FILE SEARCH VIEW -->
+        <section class="tab-view" id="files-tab">
+          <div class="section-header">
+            <h3>Approved Directory File Search</h3>
+            <p>Search files securely across your Desktop, Documents, Downloads, and Project folder.</p>
+          </div>
+
+          <div class="search-bar-card">
+            <input type="text" id="file-search-input" placeholder="Search by filename or keyword...">
+            <input type="text" id="file-ext-input" placeholder="Extension (e.g. .py, .pdf, .txt)" style="max-width: 180px;">
+            <button class="btn primary" id="execute-file-search-btn">Search Files</button>
+          </div>
+
+          <div class="file-results-container" id="file-results">
+            <div class="empty-state">Type a query above to search approved folders.</div>
+          </div>
+        </section>
+
+        <!-- 5. IMAGE STUDIO VIEW -->
+        <section class="tab-view" id="images-tab">
+          <div class="section-header">
+            <h3>Jenni AI Image Studio</h3>
+            <p>Generate visuals using local ComfyUI or intelligent synthesis, tailored for 4GB RTX 3050.</p>
+          </div>
+
+          <div class="studio-layout">
+            <div class="prompt-panel">
+              <div class="comfy-status-card" id="comfy-status-card">
+                <div class="status-indicator">
+                  <span class="status-dot warning" id="comfy-dot"></span>
+                  <span id="comfy-status-text">ComfyUI: Checking...</span>
+                </div>
+                <div class="gpu-recommendation" id="gpu-rec-text">
+                  Detecting GPU model and VRAM...
+                </div>
+              </div>
+
+              <div class="input-group">
+                <label for="image-prompt">Image Prompt</label>
+                <textarea id="image-prompt" rows="3" placeholder="A futuristic cybernetic personal assistant in a glass laboratory with neon blue lights..."></textarea>
+              </div>
+
+              <div class="input-row">
+                <div class="input-group">
+                  <label>Aspect Ratio</label>
+                  <select id="image-ratio">
+                    <option value="512x512">Square (512x512) - Recommended for 4GB</option>
+                    <option value="768x512">Landscape (768x512)</option>
+                    <option value="512x768">Portrait (512x768)</option>
+                  </select>
+                </div>
+              </div>
+
+              <button class="btn primary" id="generate-image-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span>Generate Artwork</span>
+              </button>
+            </div>
+
+            <div class="gallery-panel">
+              <h4>Generated Artworks</h4>
+              <div class="image-gallery-grid" id="image-gallery">
+                <div class="empty-state">No generated images yet.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. AUTOMATIONS & TASKS VIEW -->
+        <section class="tab-view" id="tasks-tab">
+          <div class="section-header">
+            <h3>Automated Task Workflows</h3>
+            <p>Execute multi-step PC tasks with progress tracking, safety checks, and stop controls.</p>
+          </div>
+
+          <div class="workflows-grid" id="workflows-container">
+            <!-- Dynamically populated -->
+          </div>
+
+          <div class="subsection">
+            <h4>Task Execution History & Progress</h4>
+            <div class="task-history-list" id="task-history-list">
+              <div class="empty-state">No workflows executed yet.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. ANDROID & MOBILE CONNECT VIEW -->
+        <section class="tab-view" id="mobile-tab">
+          <div class="section-header">
+            <h3>Android 12 Phone Integration</h3>
+            <p>Access Jenni AI from your phone over Tailscale private networking or local Wi-Fi.</p>
+          </div>
+
+          <div class="mobile-grid">
+            <div class="mobile-card">
+              <h4>Direct Phone Connection</h4>
+              <p>Scan or open this authenticated link on your Android phone's Chrome or Edge browser:</p>
+              
+              <div class="tailscale-status-banner">
+                <div class="node-badge">
+                  <span class="status-dot online"></span>
+                  <strong>Laptop:</strong> 100.102.38.116:8000
+                </div>
+                <div class="node-badge">
+                  <span class="status-dot online"></span>
+                  <strong>Phone:</strong> 100.74.215.8 (Connected)
+                </div>
+              </div>
+
+              <div class="qr-container">
+                <img id="mobile-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=http://100.102.38.116:8000?token=jenni-mobile-token-2026&bgcolor=0f-17-2a&color=38-bdf8" alt="Scan to connect phone">
+                <div class="qr-hint">Point your Android 12 camera here to connect instantly!</div>
+              </div>
+
+              <div class="url-box" id="mobile-connect-urls">
+                <div>🔗 <a id="direct-tailscale-link" href="http://100.102.38.116:8000?token=jenni-mobile-token-2026" target="_blank" style="color: #38bdf8;">http://100.102.38.116:8000?token=jenni-mobile-token-2026</a></div>
+              </div>
+              
+              <button class="btn primary" id="copy-phone-url-btn" onclick="copyPhoneUrl()" style="width: 100%; justify-content: center; margin-bottom: 14px;">
+                📋 Copy Phone Connection Link
+              </button>
+
+              <div class="tip-box">
+                <strong>Android Tip:</strong> Tap the 3-dots browser menu in Chrome and select <em>"Add to Home screen"</em> to install Jenni AI as a standalone app on your Android 12 phone!
+              </div>
+            </div>
+
+            <div class="mobile-card">
+              <h4>Tailscale Secure Setup</h4>
+              <ol class="setup-steps">
+                <li><strong>Laptop IP:</strong> <code>100.102.38.116</code></li>
+                <li><strong>Phone IP:</strong> <code>100.74.215.8</code> (Active mesh connected)</li>
+                <li>Both devices communicate directly through encrypted WireGuard tunnels via Tailscale.</li>
+                <li>No router port forwarding or public firewall holes required!</li>
+                <li>All voice chat, persistent memories, PC controls, and image generation are fully accessible from your phone.</li>
+              </ol>
+            </div>
+
+            <div class="mobile-card full-width">
+              <h4>Tasker Android Automation Integration</h4>
+              <p>Trigger Jenni AI from Tasker scenes, widgets, or voice triggers on Android 12:</p>
+              <pre class="code-preview" id="tasker-preview">
+Method: POST
+URL: http://100.102.38.116:8000/api/chat
+Headers:
+  Content-Type: application/json
+  X-Jenni-Token: jenni-mobile-token-2026
+Body:
+  {"message": "%VOICE_INPUT"}
+              </pre>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Safety Confirmation Modal -->
+  <div class="modal-backdrop hidden" id="confirmation-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="warning-icon">⚠️</div>
+        <h3>Jenni AI — Security Confirmation</h3>
+      </div>
+      <div class="modal-body">
+        <p id="modal-confirm-desc">A sensitive PC action requires your explicit approval.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn danger" id="modal-reject-btn">Cancel Action</button>
+        <button class="btn success" id="modal-approve-btn">Approve & Execute</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Preview Modal -->
+  <div class="modal-backdrop hidden" id="image-modal">
+    <div class="modal-dialog image-dialog">
+      <button class="close-modal-btn" id="close-image-modal">&times;</button>
+      <img id="modal-image-preview" src="" alt="Jenni AI Generated Artwork">
+      <div class="image-modal-info">
+        <span id="modal-image-name"></span>
+        <a id="modal-image-download" class="btn primary" download>Download Image</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
