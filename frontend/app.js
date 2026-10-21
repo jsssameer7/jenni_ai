@@ -1,7 +1,7 @@
 // Jenni AI — Your Personal Assistant (Frontend Client)
 
 let currentSessionId = "default";
-let isSpeakingEnabled = true;
+let isSpeakingEnabled = false;
 let activeConfirmationId = null;
 let isRecording = false;
 let speechRecognition = null;
@@ -169,25 +169,41 @@ function setupVoiceSynthesis() {
   const iconOn = document.getElementById("tts-icon-on");
   const iconOff = document.getElementById("tts-icon-off");
 
+  // Load user saved preference, default to disabled (false)
+  const savedPref = localStorage.getItem("jenni_audio_output");
+  isSpeakingEnabled = savedPref === "true"; // False unless user explicitly turned it on
+
+  function updateTTSUI() {
+    if (isSpeakingEnabled) {
+      if (ttsLabel) ttsLabel.textContent = "Audio: On";
+      if (iconOn) iconOn.classList.remove("hidden");
+      if (iconOff) iconOff.classList.add("hidden");
+    } else {
+      if (ttsLabel) ttsLabel.textContent = "Audio: Off";
+      if (iconOn) iconOn.classList.add("hidden");
+      if (iconOff) iconOff.classList.remove("hidden");
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+    }
+  }
+
+  updateTTSUI();
+
   if (ttsBtn) {
     ttsBtn.addEventListener("click", () => {
       isSpeakingEnabled = !isSpeakingEnabled;
-      if (isSpeakingEnabled) {
-        ttsLabel.textContent = "Spoken: On";
-        iconOn.classList.remove("hidden");
-        iconOff.classList.add("hidden");
-      } else {
-        ttsLabel.textContent = "Spoken: Muted";
-        iconOn.classList.add("hidden");
-        iconOff.classList.remove("hidden");
-        if (window.speechSynthesis) window.speechSynthesis.cancel();
-      }
+      localStorage.setItem("jenni_audio_output", isSpeakingEnabled ? "true" : "false");
+      updateTTSUI();
     });
   }
 }
 
 function speakTextAloud(text) {
-  if (!isSpeakingEnabled || !text) return;
+  if (!isSpeakingEnabled || !text) {
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+    return;
+  }
 
   if ("speechSynthesis" in window) {
     window.speechSynthesis.cancel();
@@ -321,8 +337,8 @@ async function sendMessage(text) {
       const data = await res.json();
       renderMessage("assistant", data.content, data.action);
 
-      // Speak answer aloud
-      if (data.spoken_text) {
+      // Speak answer aloud only if explicitly enabled
+      if (isSpeakingEnabled && data.spoken_text) {
         speakTextAloud(data.spoken_text);
       }
 

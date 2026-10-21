@@ -50,6 +50,7 @@ class Settings(BaseSettings):
     
     # Speech / Voice
     DEFAULT_GREETING: str = "Hello! I'm Jenni AI. How can I help you today?"
+    ENABLE_AUDIO_OUTPUT: bool = False
     TTS_RATE: int = 180
     TTS_VOLUME: float = 1.0
     DEFAULT_LANGUAGE: str = "en-US"
