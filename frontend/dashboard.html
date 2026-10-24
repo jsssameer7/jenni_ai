@@ -8,6 +8,23 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    // Auth guard — redirect to /login if no valid session
+    (function () {
+      const token = localStorage.getItem('jenni_session_token');
+      if (!token) { window.location.replace('/login'); return; }
+      // Verify token is still valid (non-blocking — page loads either way)
+      fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(r => {
+          if (r.status === 401) {
+            localStorage.removeItem('jenni_session_token');
+            localStorage.removeItem('jenni_user');
+            window.location.replace('/login');
+          }
+        })
+        .catch(() => {}); // offline / server down — let page load
+    })();
+  </script>
 </head>
 <body>
   <div class="app-container">
@@ -103,6 +120,12 @@
           <!-- Clear Chat -->
           <button class="control-btn danger" id="clear-chat-btn" title="Clear Conversation History">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+
+          <!-- Logout -->
+          <button class="control-btn" id="logout-btn" title="Sign Out" onclick="handleLogout()" style="margin-left:4px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span id="logout-user-label" style="font-size:0.78rem;opacity:0.7;"></span>
           </button>
         </div>
       </header>
@@ -453,5 +476,30 @@ Body:
   </div>
 
   <script src="/static/app.js"></script>
+  <script>
+    // ── Auth: show username in logout button ──
+    (function () {
+      try {
+        const u = JSON.parse(localStorage.getItem('jenni_user') || '{}');
+        const label = document.getElementById('logout-user-label');
+        if (label && u.display_name) label.textContent = u.display_name;
+      } catch (e) {}
+    })();
+
+    async function handleLogout() {
+      const token = localStorage.getItem('jenni_session_token');
+      if (token) {
+        try {
+          await fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+        } catch (e) {}
+      }
+      localStorage.removeItem('jenni_session_token');
+      localStorage.removeItem('jenni_user');
+      window.location.replace('/login');
+    }
+  </script>
 </body>
 </html>

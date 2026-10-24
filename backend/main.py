@@ -22,21 +22,36 @@ from backend.file_service import file_service
 from backend.voice_service import voice_service
 from backend.image_service import image_service
 from backend.task_service import task_service
+from backend.user_auth import (
+    init_users_table,
+    create_user,
+    login_user,
+    verify_session_token,
+    logout_user,
+    list_users,
+)
+from backend.mongodb import init_mongo, close_mongo, mongo_ping
 
 from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    init_db()
+    # Connect to MongoDB first (all collections depend on it)
+    init_mongo()
+    init_db()          # no-op now, kept for compatibility
+    init_users_table() # seeds default admin user if collection is empty
     print("=" * 60)
     print(f"  {settings.APP_TITLE} (v{settings.VERSION}) initialized.")
-    print(f"  Ollama URL: {settings.OLLAMA_BASE_URL} (Model: {settings.OLLAMA_MODEL})")
-    print(f"  Web Dashboard: http://localhost:{settings.PORT}")
+    print(f"  Ollama URL  : {settings.OLLAMA_BASE_URL} (Model: {settings.OLLAMA_MODEL})")
+    print(f"  MongoDB     : {settings.MONGODB_URI}  db={settings.MONGODB_DB}")
+    print(f"  Web UI      : http://localhost:{settings.PORT}")
+    print(f"  Login page  : http://localhost:{settings.PORT}/login")
     ips = get_lan_and_tailscale_ips()
     for item in ips:
-        print(f"  Phone Access ({item['type']}): http://{item['ip']}:{item['port']}?token={settings.AUTH_TOKEN}")
+        print(f"  Phone ({item['type']}): http://{item['ip']}:{item['port']}/login")
     print("=" * 60)
     yield
+    close_mongo()
 
 # Initialize FastAPI application
 app = FastAPI(
@@ -94,6 +109,71 @@ class TaskRunRequest(BaseModel):
 class TaskCancelRequest(BaseModel):
     task_id: str
 
+# --- Auth Request Models ---
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+class RegisterRequest(BaseModel):
+    username: str
+    display_name: str
+    password: str
+
+# --- Auth Endpoints ---
+
+@app.post("/api/auth/login")
+async def api_login(req: LoginRequest):
+    """Login with username + password, returns a session token."""
+    result = login_user(req.username, req.password)
+    if not result:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid username or password.")
+    return result
+
+@app.post("/api/auth/register")
+async def api_register(req: RegisterRequest):
+    """Register a new user account."""
+    if len(req.password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters.")
+    try:
+        user = create_user(req.username, req.display_name, req.password)
+        return {"success": True, "user": user}
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+
+@app.get("/api/auth/me")
+async def api_me(request: Request):
+    """Return current user info from session token."""
+    token = _extract_bearer(request)
+    if not token:
+        raise HTTPException(status_code=401, detail="No session token provided.")
+    user = verify_session_token(token)
+    if not user:
+        raise HTTPException(status_code=401, detail="Session expired or invalid. Please log in again.")
+    return user
+
+@app.post("/api/auth/logout")
+async def api_logout(request: Request):
+    """Invalidate the current session token."""
+    token = _extract_bearer(request)
+    if token:
+        logout_user(token)
+    return {"success": True, "message": "Logged out."}
+
+@app.get("/api/auth/users")
+async def api_list_users(request: Request):
+    """List all users (admin only)."""
+    token = _extract_bearer(request)
+    user = verify_session_token(token) if token else None
+    if not user or user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required.")
+    return list_users()
+
+def _extract_bearer(request: Request) -> str | None:
+    auth = request.headers.get("Authorization", "")
+    if auth.startswith("Bearer "):
+        return auth[7:]
+    return None
+
 # --- Endpoints ---
 
 @app.get("/api/status")
@@ -110,6 +190,7 @@ async def get_system_status():
         "ai": ai_status,
         "gpu": gpu_status,
         "network": network_ips,
+        "mongodb": mongo_ping(),
         "auth_required_for_remote": settings.REQUIRE_AUTH_FOR_REMOTE,
         "token": settings.AUTH_TOKEN
     }
@@ -149,7 +230,7 @@ async def add_memory(req: MemoryRequest):
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.delete("/api/memory/{memory_id}", dependencies=[Depends(verify_auth)])
-async def remove_memory(memory_id: int):
+async def remove_memory(memory_id: str):
     success = memory_service.remove(memory_id)
     if not success:
         raise HTTPException(status_code=404, detail="Memory item not found.")
@@ -289,15 +370,22 @@ async def serve_landing():
     landing_file = FRONTEND_DIR / "landing.html"
     if landing_file.exists():
         return FileResponse(landing_file)
-    # Fallback to dashboard if landing page doesn't exist yet
     dashboard_file = FRONTEND_DIR / "dashboard.html"
     if dashboard_file.exists():
         return FileResponse(dashboard_file)
     return {"message": f"{settings.APP_TITLE} is running. Frontend not yet created."}
 
+@app.get("/login")
+async def serve_login():
+    """Serve the login / register page."""
+    login_file = FRONTEND_DIR / "login.html"
+    if login_file.exists():
+        return FileResponse(login_file)
+    return {"message": "Login page not found."}
+
 @app.get("/app")
 async def serve_app():
-    """Serve the main Jenni AI dashboard application."""
+    """Serve the main Jenni AI dashboard application (requires login)."""
     dashboard_file = FRONTEND_DIR / "dashboard.html"
     if dashboard_file.exists():
         return FileResponse(dashboard_file)

@@ -30,9 +30,13 @@ class Settings(BaseSettings):
     REQUIRE_AUTH_FOR_LOCAL: bool = False  # Localhost is trusted by default
     REQUIRE_AUTH_FOR_REMOTE: bool = True  # Remote LAN/Tailscale must authenticate
     
-    # Database
+    # Database — SQLite (legacy / fallback)
     DATABASE_PATH: Path = DATA_DIR / "jenni_ai.db"
     IMAGES_PATH: Path = IMAGES_DIR
+
+    # Database — MongoDB
+    MONGODB_URI: str = "mongodb://localhost:27017/"
+    MONGODB_DB: str = "jenni_ai"
     
     # AI Engine - Ollama
     OLLAMA_BASE_URL: str = "http://127.0.0.1:11434"

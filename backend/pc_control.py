@@ -6,7 +6,8 @@ import json
 from typing import Dict, Any, Optional, List
 from urllib.parse import urlparse
 from backend.config import settings
-from backend.database import get_connection, log_action
+from backend.database import log_action
+from backend.mongodb import get_sync_db
 
 class PCControlService:
     @staticmethod
@@ -136,31 +137,27 @@ class PCControlService:
     def create_pending_confirmation(action_type: str, description: str, payload: Dict[str, Any]) -> str:
         """Create a safety confirmation ticket for sensitive operations."""
         conf_id = str(uuid.uuid4())[:8]
-        with get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute(
-                "INSERT INTO pending_confirmations (id, action_type, description, payload, status) VALUES (?, ?, ?, ?, 'pending')",
-                (conf_id, action_type, description, json.dumps(payload))
-            )
-            conn.commit()
+        get_sync_db().pending_confirmations.insert_one({
+            "id": conf_id,
+            "action_type": action_type,
+            "description": description,
+            "payload": payload,
+            "status": "pending",
+        })
         return conf_id
 
     @staticmethod
     def resolve_confirmation(conf_id: str, approved: bool) -> Dict[str, Any]:
         """User explicitly approves or rejects a pending sensitive operation."""
-        with get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM pending_confirmations WHERE id = ? AND status = 'pending'", (conf_id,))
-            row = cursor.fetchone()
-            if not row:
-                return {"success": False, "message": "Confirmation request not found or already processed."}
+        db = get_sync_db()
+        row = db.pending_confirmations.find_one({"id": conf_id, "status": "pending"})
+        if not row:
+            return {"success": False, "message": "Confirmation request not found or already processed."}
 
-            action_type = row["action_type"]
-            payload = json.loads(row["payload"])
-
-            new_status = "approved" if approved else "rejected"
-            cursor.execute("UPDATE pending_confirmations SET status = ? WHERE id = ?", (new_status, conf_id))
-            conn.commit()
+        action_type = row["action_type"]
+        payload = row["payload"]
+        new_status = "approved" if approved else "rejected"
+        db.pending_confirmations.update_one({"id": conf_id}, {"$set": {"status": new_status}})
 
         if not approved:
             log_action(action_type, f"confirmation_{conf_id}", "rejected_by_user", payload)
@@ -168,17 +165,16 @@ class PCControlService:
 
         # Execute approved sensitive action
         log_action(action_type, f"confirmation_{conf_id}", "approved_by_user", payload)
-        
+
         if action_type == "open_website":
             webbrowser.open(payload.get("url"))
             return {"success": True, "message": f"Opened website: {payload.get('url')}"}
-        
+
         elif action_type == "lock_pc":
             subprocess.Popen(["rundll32.exe", "user32.dll,LockWorkStation"])
             return {"success": True, "message": "PC has been locked."}
 
         elif action_type == "custom_command":
-            # Approved command execution
             cmd = payload.get("command")
             res = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=15)
             return {"success": True, "output": res.stdout or res.stderr}

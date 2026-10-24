@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Jenni AI — Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #050811;
+      --surface: #0d1117;
+      --card: #111827;
+      --border: rgba(255,255,255,0.07);
+      --border-hover: rgba(99,179,237,0.35);
+      --cyan: #38bdf8;
+      --violet: #a78bfa;
+      --pink: #f472b6;
+      --green: #34d399;
+      --text: #f1f5f9;
+      --text-muted: #64748b;
+      --text-dim: #94a3b8;
+      --error: #f87171;
+      --radius: 14px;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /* ─── Background Orbs ─── */
+    .bg-scene {
+      position: fixed; inset: 0; z-index: 0; overflow: hidden;
+    }
+    .orb {
+      position: absolute; border-radius: 50%;
+      filter: blur(100px); opacity: 0.18;
+      animation: orb-drift 14s ease-in-out infinite;
+    }
+    .orb-1 { width: 520px; height: 520px; background: var(--violet); top: -120px; left: -100px; animation-delay: 0s; }
+    .orb-2 { width: 420px; height: 420px; background: var(--cyan);   bottom: -80px; right: -80px; animation-delay: -5s; }
+    .orb-3 { width: 300px; height: 300px; background: var(--pink);   top: 40%; left: 55%; animation-delay: -9s; }
+    @keyframes orb-drift {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      33%       { transform: translate(30px,-30px) scale(1.05); }
+      66%       { transform: translate(-20px, 20px) scale(0.97); }
+    }
+
+    /* Grid overlay */
+    .grid-overlay {
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+
+    /* ─── Main Layout ─── */
+    .page {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    /* ─── Brand ─── */
+    .brand {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 36px;
+      text-decoration: none;
+    }
+    .brand-orb {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 24px rgba(56,189,248,0.4);
+      animation: pulse-orb 3s ease-in-out infinite;
+    }
+    @keyframes pulse-orb {
+      0%, 100% { box-shadow: 0 0 24px rgba(56,189,248,0.4); }
+      50%       { box-shadow: 0 0 40px rgba(56,189,248,0.65); }
+    }
+    .brand-orb-inner {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: rgba(255,255,255,0.9);
+    }
+    .brand-name {
+      font-size: 1.6rem; font-weight: 700;
+      background: linear-gradient(90deg, var(--cyan), var(--violet));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ─── Card ─── */
+    .card {
+      width: 100%; max-width: 420px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px 36px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04) inset;
+      backdrop-filter: blur(12px);
+    }
+
+    .card-title {
+      font-size: 1.6rem; font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .card-subtitle {
+      font-size: 0.9rem; color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+
+    /* ─── Tabs ─── */
+    .tabs {
+      display: flex;
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 28px;
+      gap: 4px;
+    }
+    .tab-btn {
+      flex: 1; padding: 9px;
+      border: none; background: transparent;
+      color: var(--text-muted); font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem; font-weight: 500;
+      border-radius: 8px; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(167,139,250,0.15));
+      color: var(--text);
+      box-shadow: 0 0 0 1px var(--border-hover);
+    }
+
+    /* ─── Form ─── */
+    .form { display: flex; flex-direction: column; gap: 18px; }
+    .field { display: flex; flex-direction: column; gap: 7px; }
+    .field label {
+      font-size: 0.82rem; font-weight: 500;
+      color: var(--text-dim); letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .input-wrap { position: relative; }
+    .input-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--text-muted);
+      display: flex; align-items: center;
+      pointer-events: none;
+    }
+    .input-icon svg { width: 17px; height: 17px; }
+    .field input {
+      width: 100%; padding: 13px 14px 13px 42px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text); font-family: 'Outfit', sans-serif; font-size: 0.97rem;
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field input::placeholder { color: var(--text-muted); }
+    .field input:focus {
+      border-color: rgba(56,189,248,0.5);
+      box-shadow: 0 0 0 3px rgba(56,189,248,0.1);
+    }
+
+    /* password toggle */
+    .pwd-toggle {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); display: flex; align-items: center;
+      transition: color 0.2s;
+    }
+    .pwd-toggle:hover { color: var(--cyan); }
+    .pwd-toggle svg { width: 17px; height: 17px; }
+
+    /* ─── Error / Success banners ─── */
+    .alert {
+      display: none; padding: 11px 14px;
+      border-radius: 10px; font-size: 0.88rem;
+      font-weight: 500; gap: 9px; align-items: center;
+    }
+    .alert.show { display: flex; }
+    .alert.error  { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
+    .alert.success { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3); color: var(--green); }
+    .alert svg { flex-shrink: 0; width: 16px; height: 16px; }
+
+    /* ─── Submit Button ─── */
+    .btn-submit {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      border: none; border-radius: 11px;
+      color: #fff; font-family: 'Outfit', sans-serif;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer; position: relative; overflow: hidden;
+      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(56,189,248,0.3);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-submit:hover:not(:disabled) { opacity: 0.93; transform: translateY(-1px); box-shadow: 0 8px 28px rgba(56,189,248,0.4); }
+    .btn-submit:active:not(:disabled) { transform: translateY(0); }
+    .btn-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    /* Spinner */
+    .spinner {
+      display: none; width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    .btn-submit.loading .spinner { display: block; }
+    .btn-submit.loading .btn-label { opacity: 0.6; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── Divider ─── */
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      color: var(--text-muted); font-size: 0.8rem;
+      margin: 4px 0;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1;
+      height: 1px; background: var(--border);
+    }
+
+    /* ─── Footer ─── */
+    .page-footer {
+      margin-top: 28px;
+      font-size: 0.8rem; color: var(--text-muted);
+      text-align: center;
+    }
+    .page-footer a { color: var(--cyan); text-decoration: none; }
+    .page-footer a:hover { text-decoration: underline; }
+
+    /* ─── Form sections shown/hidden ─── */
+    .form-section { display: none; }
+    .form-section.active { display: flex; flex-direction: column; gap: 18px; }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 480px) {
+      .card { padding: 28px 20px; border-radius: 16px; }
+      .card-title { font-size: 1.35rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-scene">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+  <div class="grid-overlay"></div>
+
+  <main class="page">
+    <!-- Brand -->
+    <a href="/" class="brand">
+      <div class="brand-orb"><div class="brand-orb-inner"></div></div>
+      <span class="brand-name">Jenni AI</span>
+    </a>
+
+    <!-- Card -->
+    <div class="card">
+      <div class="card-title" id="card-title">Welcome back</div>
+      <div class="card-subtitle" id="card-subtitle">Sign in to your personal AI assistant</div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+        <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Register</button>
+      </div>
+
+      <!-- Alert banner -->
+      <div class="alert" id="alert-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span id="alert-msg"></span>
+      </div>
+
+      <!-- ── LOGIN FORM ── -->
+      <div class="form-section active" id="login-section">
+        <div class="field">
+          <label>Username</label>
+          <div class="input-wrap">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+            </span>
+            <input type="text" id="login-username" placeholder="Enter your username" autocomplete="username" autocapitalize="none">
+          </div>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </span>
+            <input type="password" id="login-password" placeholder="Enter your password" autocomplete="current-password">
+            <button class="pwd-toggle" type="button" onclick="togglePwd('login-password', this)" tabindex="-1">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <button class="btn-submit" id="login-btn" onclick="handleLogin()">
+          <div class="spinner"></div>
+          <span class="btn-label">Sign In to Jenni AI</span>
+        </button>
+      </div>
+
+      <!-- ── REGISTER FORM ── -->
+      <div class="form-section" id="register-section">
+        <div class="field">
+          <label>Display Name</label>
+          <div class="input-wrap">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+            </span>
+            <input type="text" id="reg-display" placeholder="Your name (e.g. Sameer)">
+          </div>
+        </div>
+        <div class="field">
+          <label>Username</label>
+          <div class="input-wrap">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+            </span>
+            <input type="text" id="reg-username" placeholder="Choose a username" autocapitalize="none">
+          </div>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </span>
+            <input type="password" id="reg-password" placeholder="Create a password" autocomplete="new-password">
+            <button class="pwd-toggle" type="button" onclick="togglePwd('reg-password', this)" tabindex="-1">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Confirm Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </span>
+            <input type="password" id="reg-confirm" placeholder="Repeat your password" autocomplete="new-password">
+            <button class="pwd-toggle" type="button" onclick="togglePwd('reg-confirm', this)" tabindex="-1">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <button class="btn-submit" id="register-btn" onclick="handleRegister()">
+          <div class="spinner"></div>
+          <span class="btn-label">Create Account</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <a href="/">← Back to Jenni AI website</a>
+    </div>
+  </main>
+
+  <script>
+    // ─── Redirect if already logged in ───
+    (function () {
+      const token = localStorage.getItem('jenni_session_token');
+      if (token) {
+        fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + token } })
+          .then(r => { if (r.ok) window.location.replace('/app'); })
+          .catch(() => {});
+      }
+    })();
+
+    // ─── Tab switching ───
+    function switchTab(tab) {
+      const isLogin = tab === 'login';
+      document.getElementById('tab-login').classList.toggle('active', isLogin);
+      document.getElementById('tab-register').classList.toggle('active', !isLogin);
+      document.getElementById('login-section').classList.toggle('active', isLogin);
+      document.getElementById('register-section').classList.toggle('active', !isLogin);
+      document.getElementById('card-title').textContent = isLogin ? 'Welcome back' : 'Create account';
+      document.getElementById('card-subtitle').textContent = isLogin
+        ? 'Sign in to your personal AI assistant'
+        : 'Register to start using Jenni AI';
+      hideAlert();
+    }
+
+    // ─── Alert helpers ───
+    function showAlert(msg, type = 'error') {
+      const box = document.getElementById('alert-box');
+      document.getElementById('alert-msg').textContent = msg;
+      box.className = 'alert show ' + type;
+    }
+    function hideAlert() {
+      document.getElementById('alert-box').className = 'alert';
+    }
+
+    // ─── Password visibility toggle ───
+    function togglePwd(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      btn.innerHTML = isHidden
+        ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+        : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+    }
+
+    // ─── Login ───
+    async function handleLogin() {
+      hideAlert();
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      if (!username || !password) {
+        showAlert('Please enter both username and password.');
+        return;
+      }
+
+      const btn = document.getElementById('login-btn');
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.token) {
+          localStorage.setItem('jenni_session_token', data.token);
+          localStorage.setItem('jenni_user', JSON.stringify(data.user));
+          showAlert('✓ Login successful! Launching Jenni AI...', 'success');
+          setTimeout(() => window.location.replace('/app'), 900);
+        } else {
+          showAlert(data.detail || 'Invalid username or password.');
+        }
+      } catch (e) {
+        showAlert('Cannot connect to Jenni AI server. Is it running?');
+      } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    }
+
+    // ─── Register ───
+    async function handleRegister() {
+      hideAlert();
+      const display  = document.getElementById('reg-display').value.trim();
+      const username = document.getElementById('reg-username').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const confirm  = document.getElementById('reg-confirm').value;
+
+      if (!display || !username || !password || !confirm) {
+        showAlert('Please fill in all fields.');
+        return;
+      }
+      if (password.length < 6) {
+        showAlert('Password must be at least 6 characters.');
+        return;
+      }
+      if (password !== confirm) {
+        showAlert('Passwords do not match.');
+        return;
+      }
+
+      const btn = document.getElementById('register-btn');
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      try {
+        // Step 1 — Register
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, display_name: display, password })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          showAlert(data.detail || 'Registration failed.');
+          return;
+        }
+
+        // Step 2 — Auto-login with the same credentials
+        showAlert('✓ Account created! Signing you in...', 'success');
+        const loginRes = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const loginData = await loginRes.json();
+
+        if (loginRes.ok && loginData.token) {
+          localStorage.setItem('jenni_session_token', loginData.token);
+          localStorage.setItem('jenni_user', JSON.stringify(loginData.user));
+          showAlert('✓ Welcome to Jenni AI! Launching...', 'success');
+          setTimeout(() => window.location.replace('/app'), 800);
+        } else {
+          // Fallback: go to login tab with username prefilled
+          setTimeout(() => {
+            switchTab('login');
+            document.getElementById('login-username').value = username;
+            document.getElementById('login-password').focus();
+          }, 1200);
+        }
+      } catch (e) {
+        showAlert('Cannot connect to Jenni AI server.');
+      } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    }
+
+    // ─── Enter key shortcuts ───
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      const loginActive = document.getElementById('login-section').classList.contains('active');
+      if (loginActive) handleLogin();
+      else handleRegister();
+    });
+  </script>
+</body>
+</html>
