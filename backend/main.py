@@ -284,8 +284,21 @@ if FRONTEND_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
 
 @app.get("/")
-async def serve_index():
-    index_file = FRONTEND_DIR / "index.html"
-    if index_file.exists():
-        return FileResponse(index_file)
-    return {"message": f"{settings.APP_TITLE} is running. Frontend index.html not yet created."}
+async def serve_landing():
+    """Serve the public-facing landing page website."""
+    landing_file = FRONTEND_DIR / "landing.html"
+    if landing_file.exists():
+        return FileResponse(landing_file)
+    # Fallback to dashboard if landing page doesn't exist yet
+    dashboard_file = FRONTEND_DIR / "dashboard.html"
+    if dashboard_file.exists():
+        return FileResponse(dashboard_file)
+    return {"message": f"{settings.APP_TITLE} is running. Frontend not yet created."}
+
+@app.get("/app")
+async def serve_app():
+    """Serve the main Jenni AI dashboard application."""
+    dashboard_file = FRONTEND_DIR / "dashboard.html"
+    if dashboard_file.exists():
+        return FileResponse(dashboard_file)
+    return {"message": f"{settings.APP_TITLE} dashboard is loading..."}
