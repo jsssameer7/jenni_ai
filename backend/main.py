@@ -394,3 +394,11 @@ async def serve_app():
     if dashboard_file.exists():
         return FileResponse(dashboard_file)
     return {"message": f"{settings.APP_TITLE} dashboard is loading..."}
+
+@app.get("/ad")
+async def serve_ad():
+    """Serve the interactive promotional ad video trailer."""
+    ad_file = FRONTEND_DIR / "ad_video.html"
+    if ad_file.exists():
+        return FileResponse(ad_file)
+    return {"message": "Ad video not found."}

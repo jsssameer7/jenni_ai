@@ -23,6 +23,7 @@
         <a href="#how-it-works">How it works</a>
         <a href="#specs">Specs</a>
         <a href="#android">Android</a>
+        <a href="/ad" style="color: #38bdf8; font-weight: 600;">Ad Video</a>
         <a href="/login" class="nav-cta-btn">Sign In</a>
       </div>
       <button class="mobile-nav-toggle" id="mobile-nav-toggle" aria-label="Toggle menu">
@@ -35,6 +36,7 @@
     <a href="#how-it-works" onclick="closeMobileMenu()">How it works</a>
     <a href="#specs" onclick="closeMobileMenu()">Specs</a>
     <a href="#android" onclick="closeMobileMenu()">Android</a>
+    <a href="/ad" onclick="closeMobileMenu()">Ad Video</a>
     <a href="/app" class="mobile-cta">Open Dashboard</a>
   </div>
   <!-- Hero Section -->
@@ -52,6 +54,7 @@
         <p class="hero-subtitle">A Jarvis-inspired AI assistant built for Windows 11 and Android 12. Chat naturally, control your PC, remember your preferences, generate images, and automate tasks &mdash; entirely offline, entirely yours.</p>
         <div class="hero-actions">
           <a href="/app" class="btn-hero-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>Launch Dashboard</a>
+          <a href="/ad" class="btn-hero-secondary" style="border-color: rgba(56,189,248,0.4); color: var(--cyan);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>Watch Trailer</a>
           <a href="#features" class="btn-hero-secondary">Explore Features<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
         </div>
         <div class="hero-stats">
@@ -97,7 +100,7 @@
       <div class="status-items">
         <div class="status-item"><div class="ping green"></div><span>Ollama qwen2.5:3b &mdash; Active</span></div>
         <div class="status-item"><div class="ping cyan"></div><span>FastAPI Backend &mdash; Running</span></div>
-        <div class="status-item"><div class="ping violet"></div><span>SQLite Memory &mdash; Persistent</span></div>
+        <div class="status-item"><div class="ping violet"></div><span>MongoDB &mdash; Persistent</span></div>
         <div class="status-item"><div class="ping green"></div><span>Tailscale Mesh &mdash; Connected</span></div>
         <div class="status-item"><div class="ping yellow"></div><span>ComfyUI &mdash; 4GB VRAM Ready</span></div>
       </div>
@@ -115,7 +118,7 @@
         <div class="feature-card large" data-color="cyan">
           <div class="feature-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
           <h3>Intelligent Chat</h3>
-          <p>Powered by <strong>Ollama qwen2.5:3b</strong> running locally. Ask questions, get coding help, explain concepts with full conversation history in SQLite. Switch to an online AI provider with one env var change.</p>
+          <p>Powered by <strong>Ollama qwen2.5:3b</strong> running locally. Ask questions, get coding help, explain concepts with full conversation history in MongoDB. Switch to an online AI provider with one env var change.</p>
           <div class="feature-chips"><span class="feature-chip">Offline LLM</span><span class="feature-chip">Chat History</span><span class="feature-chip">Intent Detection</span></div>
         </div>
         <div class="feature-card" data-color="violet">
@@ -128,7 +131,7 @@
           <div class="feature-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
           <h3>Zero-Secrets Memory</h3>
           <p>Remembers names, preferences, and facts. Strict security filter blocks saving passwords, tokens, or API keys.</p>
-          <div class="feature-chips"><span class="feature-chip">SQLite Backed</span><span class="feature-chip">Security Filtered</span></div>
+          <div class="feature-chips"><span class="feature-chip">MongoDB Backed</span><span class="feature-chip">Security Filtered</span></div>
         </div>
         <div class="feature-card" data-color="blue">
           <div class="feature-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
@@ -145,8 +148,8 @@
         <div class="feature-card large" data-color="violet">
           <div class="feature-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
           <h3>Image Studio</h3>
-          <p>Integrates with local <strong>ComfyUI</strong> for Stable Diffusion. Detects your <strong>NVIDIA RTX 3050 (4 GB VRAM)</strong> and recommends SD 1.5 / SD-Turbo with --lowvram mode.</p>
-          <div class="feature-chips"><span class="feature-chip">ComfyUI API</span><span class="feature-chip">VRAM Aware</span><span class="feature-chip">Offline Fallback</span></div>
+          <p>Integrates with local <strong>ComfyUI</strong> and cloud neural synthesis for Stable Diffusion. Detects your <strong>NVIDIA RTX 3050 (4 GB VRAM)</strong> and optimizes generation.</p>
+          <div class="feature-chips"><span class="feature-chip">ComfyUI API</span><span class="feature-chip">VRAM Aware</span><span class="feature-chip">Neural Flux Engine</span></div>
         </div>
         <div class="feature-card" data-color="green">
           <div class="feature-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
@@ -190,8 +193,8 @@
         <div class="tech-card"><div class="tech-logo">&#129422;</div><div class="tech-name">Ollama</div><div class="tech-desc">Local LLM inference</div></div>
         <div class="tech-card"><div class="tech-logo">&#129302;</div><div class="tech-name">Qwen2.5 3B</div><div class="tech-desc">AI language model</div></div>
         <div class="tech-card"><div class="tech-logo">&#9889;</div><div class="tech-name">FastAPI</div><div class="tech-desc">Python REST backend</div></div>
-        <div class="tech-card"><div class="tech-logo">&#128451;</div><div class="tech-name">SQLite</div><div class="tech-desc">Persistent memory</div></div>
-        <div class="tech-card"><div class="tech-logo">&#127912;</div><div class="tech-name">ComfyUI</div><div class="tech-desc">Local image gen</div></div>
+        <div class="tech-card"><div class="tech-logo">&#128451;</div><div class="tech-name">MongoDB</div><div class="tech-desc">Unified authentication & storage</div></div>
+        <div class="tech-card"><div class="tech-logo">&#127912;</div><div class="tech-name">ComfyUI / Flux</div><div class="tech-desc">Neural image synthesis</div></div>
         <div class="tech-card"><div class="tech-logo">&#128274;</div><div class="tech-name">Tailscale</div><div class="tech-desc">Encrypted networking</div></div>
         <div class="tech-card"><div class="tech-logo">&#127897;</div><div class="tech-name">Web Speech API</div><div class="tech-desc">Browser STT</div></div>
         <div class="tech-card"><div class="tech-logo">&#128013;</div><div class="tech-name">Python 3.15</div><div class="tech-desc">Backend runtime</div></div>
@@ -221,7 +224,7 @@
           <div class="android-steps">
             <div class="android-step"><div class="android-step-num">1</div><div>Install <strong>Tailscale</strong> on your laptop and Android phone</div></div>
             <div class="android-step"><div class="android-step-num">2</div><div>Sign in with the same account on both devices</div></div>
-            <div class="android-step"><div class="android-step-num">3</div><div>Open Chrome on Android: <code>http://100.102.38.116:8000</code></div></div>
+            <div class="android-step"><div class="android-step-num">3</div><div>Open Chrome on Android: <code>http://100.102.38.116:8000/login</code></div></div>
             <div class="android-step"><div class="android-step-num">4</div><div>Tap <strong>"Add to Home Screen"</strong> to install as a PWA app</div></div>
           </div>
           <div class="tailscale-info">
@@ -264,7 +267,7 @@
           <div class="sec-card"><div class="sec-icon">&#128193;</div><h4>Path Traversal Guard</h4><p>File access is confined to explicitly approved directories. System folders are inaccessible.</p></div>
           <div class="sec-card"><div class="sec-icon">&#9989;</div><h4>Confirmation Gateway</h4><p>All sensitive PC actions require your explicit approval before execution.</p></div>
           <div class="sec-card"><div class="sec-icon">&#128274;</div><h4>Token Auth for Remote</h4><p>Remote access from your phone requires a secret token. Local access is automatically trusted.</p></div>
-          <div class="sec-card"><div class="sec-icon">&#128535;</div><h4>No Internet Required</h4><p>Jenni AI runs fully offline. Ollama, SQLite, and all core features work without internet.</p></div>
+          <div class="sec-card"><div class="sec-icon">&#128535;</div><h4>No Internet Required</h4><p>Jenni AI runs fully offline. Ollama, MongoDB, and all core features work without internet.</p></div>
         </div>
       </div>
     </div>
@@ -289,7 +292,7 @@
     <div class="container">
       <div class="footer-inner">
         <div class="footer-brand"><div class="nav-orb small"><div class="nav-orb-inner"></div></div><span>Jenni AI</span></div>
-        <div class="footer-links"><a href="#features">Features</a><a href="#how-it-works">How it works</a><a href="#android">Android</a><a href="/app">Dashboard</a><a href="https://github.com/jsssameer7/jenni_ai" target="_blank">GitHub</a></div>
+        <div class="footer-links"><a href="#features">Features</a><a href="#how-it-works">How it works</a><a href="#android">Android</a><a href="/ad">Ad Video</a><a href="/app">Dashboard</a><a href="https://github.com/jsssameer7/jenni_ai" target="_blank">GitHub</a></div>
         <div class="footer-copy">Built with &hearts; for your privacy &bull; Jenni AI v1.0.0 &bull; Running on Windows 11</div>
       </div>
     </div>

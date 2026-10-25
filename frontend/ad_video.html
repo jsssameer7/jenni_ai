@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jenni AI — Official Video Trailer & Commercial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #030712;
+      --surface: #0b0f19;
+      --card: #111827;
+      --border: rgba(255, 255, 255, 0.08);
+      --cyan: #38bdf8;
+      --violet: #a78bfa;
+      --pink: #f472b6;
+      --green: #34d399;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      padding: 16px;
+    }
+
+    /* Ambient background */
+    .glow-sphere {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      filter: blur(140px);
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glow-1 { top: -200px; left: -100px; background: var(--violet); }
+    .glow-2 { bottom: -200px; right: -100px; background: var(--cyan); }
+
+    .header-bar {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .logo-orb {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.5);
+    }
+    .brand-title {
+      font-weight: 800;
+      font-size: 1.25rem;
+      background: linear-gradient(90deg, #fff, var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .back-btn {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--cyan); }
+
+    /* Video Player Container */
+    .player-container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 1100px;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8), 0 0 50px rgba(56, 189, 248, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+    }
+
+    /* Start / Big Play Overlay */
+    .play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.75);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      z-index: 20;
+      transition: opacity 0.3s ease, visibility 0.3s;
+    }
+    .play-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .big-play-btn {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      box-shadow: 0 0 40px rgba(56, 189, 248, 0.6);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .big-play-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 60px rgba(56, 189, 248, 0.85);
+    }
+    .big-play-btn svg {
+      width: 40px;
+      height: 40px;
+      margin-left: 5px;
+    }
+
+    .play-overlay h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-align: center;
+    }
+    .play-overlay p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      max-width: 480px;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    /* Video HUD Controls Bar */
+    .controls-bar {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 1100px;
+      margin-top: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .ctrl-btn {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      border-radius: 8px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .ctrl-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--cyan);
+    }
+    .ctrl-btn svg { width: 20px; height: 20px; }
+
+    /* Timeline scrubber */
+    .timeline-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .timeline-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .timeline-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 0%;
+      background: linear-gradient(90deg, var(--cyan), var(--violet));
+      border-radius: 4px;
+      transition: width 0.05s linear;
+    }
+    .time-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .scene-pill {
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--cyan);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* Action Buttons */
+    .action-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .record-btn {
+      background: linear-gradient(135deg, #ef4444, #f43f5e);
+      color: #fff;
+      border: none;
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(244, 63, 94, 0.35);
+      transition: transform 0.15s, opacity 0.2s;
+    }
+    .record-btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.95;
+    }
+    .record-btn.recording {
+      animation: pulse-rec 1.2s infinite;
+    }
+    @keyframes pulse-rec {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.75; transform: scale(0.98); }
+    }
+
+    .cta-btn {
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      color: #fff;
+      text-decoration: none;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 18px rgba(56, 189, 248, 0.3);
+      transition: transform 0.15s;
+    }
+    .cta-btn:hover { transform: translateY(-1px); }
+
+    /* Scene jump selector */
+    .scene-selector {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 1100px;
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 8px;
+    }
+    .scene-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+    }
+    .scene-card:hover, .scene-card.active {
+      border-color: var(--cyan);
+      background: rgba(56, 189, 248, 0.08);
+      transform: translateY(-2px);
+    }
+    .scene-card .s-num {
+      font-size: 0.7rem;
+      color: var(--cyan);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+    }
+    .scene-card .s-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 2px;
+    }
+
+    @media (max-width: 768px) {
+      .controls-bar { flex-wrap: wrap; }
+      .action-group { width: 100%; justify-content: space-between; }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-sphere glow-1"></div>
+  <div class="glow-sphere glow-2"></div>
+
+  <!-- Header -->
+  <header class="header-bar">
+    <a href="/" class="brand-logo">
+      <div class="logo-orb"></div>
+      <span class="brand-title">Jenni AI Commercial</span>
+    </a>
+    <a href="/app" class="back-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <span>Launch Dashboard</span>
+    </a>
+  </header>
+
+  <!-- Video Viewport Canvas -->
+  <div class="player-container" id="player-container">
+    <canvas id="video-canvas" width="1920" height="1080"></canvas>
+
+    <!-- Overlay Big Play Button -->
+    <div class="play-overlay" id="play-overlay">
+      <button class="big-play-btn" id="start-btn" title="Play Commercial">
+        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </button>
+      <h2>Meet Jenni AI</h2>
+      <p>A cinematic product showcase: 100% private offline intelligence, native Windows 11 hardware controls, creative image studio, and seamless Android mesh.</p>
+    </div>
+  </div>
+
+  <!-- Player HUD Controls -->
+  <div class="controls-bar">
+    <button class="ctrl-btn" id="toggle-play-btn" title="Play / Pause">
+      <svg id="play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      <svg id="pause-icon" style="display:none;" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+    </button>
+    <button class="ctrl-btn" id="replay-btn" title="Replay from Beginning">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+    </button>
+    <button class="ctrl-btn" id="mute-btn" title="Mute / Unmute Sound">
+      <svg id="vol-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+    </button>
+
+    <div class="timeline-wrap">
+      <div class="timeline-bar" id="timeline-bar">
+        <div class="timeline-fill" id="timeline-fill"></div>
+      </div>
+      <div class="time-label">
+        <span id="current-time-text">0:00</span>
+        <span class="scene-pill" id="current-scene-badge">Scene 1: Introduction</span>
+        <span id="duration-text">0:32</span>
+      </div>
+    </div>
+
+    <div class="action-group">
+      <button class="record-btn" id="export-video-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
+        <span id="rec-btn-text">Download Video</span>
+      </button>
+      <a href="/app" class="cta-btn">
+        <span>Try Jenni AI</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Scene Quick Switcher -->
+  <div class="scene-selector" id="scene-selector">
+    <div class="scene-card active" onclick="jumpToTime(0)">
+      <div class="s-num">01 / 06</div>
+      <div class="s-title">Next-Gen Assistant</div>
+    </div>
+    <div class="scene-card" onclick="jumpToTime(5)">
+      <div class="s-num">02 / 06</div>
+      <div class="s-title">100% Private & Local</div>
+    </div>
+    <div class="scene-card" onclick="jumpToTime(10)">
+      <div class="s-num">03 / 06</div>
+      <div class="s-title">Total PC Control</div>
+    </div>
+    <div class="scene-card" onclick="jumpToTime(16)">
+      <div class="s-num">04 / 06</div>
+      <div class="s-title">Neural Image Studio</div>
+    </div>
+    <div class="scene-card" onclick="jumpToTime(22)">
+      <div class="s-num">05 / 06</div>
+      <div class="s-title">Android 12 Mesh</div>
+    </div>
+    <div class="scene-card" onclick="jumpToTime(27)">
+      <div class="s-num">06 / 06</div>
+      <div class="s-title">Get Started Today</div>
+    </div>
+  </div>
+
+  <script>
+    // ═════════════════════════════════════════════════════════════════════
+    // JENNI AI COMMERCIAL VIDEO ENGINE (Canvas 60fps + WebAudio + Recorder)
+    // ═════════════════════════════════════════════════════════════════════
+
+    const canvas = document.getElementById('video-canvas');
+    const ctx = canvas.getContext('2d');
+    const W = 1920;
+    const H = 1080;
+
+    const TOTAL_DURATION = 32; // Seconds
+    let currentTime = 0;
+    let isPlaying = false;
+    let isMuted = false;
+    let lastTimestamp = 0;
+    let animationFrameId = null;
+
+    // MediaRecorder for Video Download
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isExporting = false;
+
+    // Web Audio Synthesizer
+    let audioCtx = null;
+    let synthInterval = null;
+    let audioDestination = null;
+
+    // Narrative Voice Over Script
+    const SCENES = [
+      {
+        start: 0,
+        end: 5,
+        title: "MEET JENNI AI",
+        subtitle: "The Future of Personal Computing",
+        speech: "Meet Jenni AI. Your intelligent, Jarvis-inspired personal assistant built for Windows 11 and Android.",
+        badge: "01: The Future of Personal Computing"
+      },
+      {
+        start: 5,
+        end: 10,
+        title: "100% PRIVATE & OFFLINE",
+        subtitle: "Zero Cloud Dependencies • Qwen 2.5 LLM",
+        speech: "Powered locally by Ollama. No subscription fees, zero cloud surveillance, and completely private on your machine.",
+        badge: "02: 100% Private & Offline"
+      },
+      {
+        start: 10,
+        end: 16,
+        title: "TOTAL PC AUTOMATION",
+        subtitle: "Hardware Monitoring • Safe App Execution",
+        speech: "Control your desktop with safe approvals. Launch VS Code, Notepad, monitor your GPU, and automate workflows effortlessly.",
+        badge: "03: Total PC Automation"
+      },
+      {
+        start: 16,
+        end: 22,
+        title: "CREATIVE NEURAL STUDIO",
+        subtitle: "ComfyUI & Generative Art on RTX 3050",
+        speech: "Synthesize high-resolution creative artwork directly on your graphics card with custom prompt controls.",
+        badge: "04: Creative Neural Studio"
+      },
+      {
+        start: 22,
+        end: 27,
+        title: "UNIFIED MOBILE MESH",
+        subtitle: "WireGuard & Tailscale Encrypted Tunnel",
+        speech: "Scan a single QR code to carry Jenni AI in your pocket with Android 12 phone and Tasker integration.",
+        badge: "05: Unified Android Mesh"
+      },
+      {
+        start: 27,
+        end: 32,
+        title: "JENNI AI",
+        subtitle: "Your Machine. Your Intelligence. Your Assistant.",
+        speech: "Experience the next generation of personal AI. Launch Jenni AI today on GitHub.",
+        badge: "06: Get Started Today"
+      }
+    ];
+
+    let lastSpokenScene = -1;
+
+    // Particles system
+    const particles = [];
+    for (let i = 0; i < 90; i++) {
+      particles.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 1.2,
+        vy: (Math.random() - 0.5) * 1.2,
+        size: Math.random() * 3 + 1,
+        color: ['#38bdf8', '#a78bfa', '#f472b6', '#34d399'][Math.floor(Math.random() * 4)],
+        alpha: Math.random() * 0.7 + 0.3
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // WEB AUDIO SYNTHESIZER (Cinematic Cyberpunk Soundtrack)
+    // ─────────────────────────────────────────────────────────────────
+    function initAudio() {
+      if (audioCtx) return;
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AudioContext();
+      audioDestination = audioCtx.createMediaStreamDestination();
+    }
+
+    function playSynthTone(freq, duration, type = 'sine', gainVal = 0.15) {
+      if (!audioCtx || isMuted) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        if (audioDestination) gain.connect(audioDestination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playCinematicImpact() {
+      if (!audioCtx || isMuted) return;
+      playSynthTone(75, 1.2, 'sawtooth', 0.25);
+      playSynthTone(150, 0.8, 'triangle', 0.2);
+    }
+
+    // Background music loop generator
+    const cyberChords = [220, 261.6, 329.6, 392, 440, 523.2];
+    let noteStep = 0;
+    function startMusicLoop() {
+      if (synthInterval) clearInterval(synthInterval);
+      synthInterval = setInterval(() => {
+        if (!isPlaying || isMuted) return;
+        const freq = cyberChords[noteStep % cyberChords.length];
+        playSynthTone(freq, 0.35, 'sine', 0.08);
+        if (noteStep % 4 === 0) {
+          playSynthTone(110, 0.7, 'triangle', 0.18); // Sub bass pulse
+        }
+        noteStep++;
+      }, 350);
+    }
+
+    // Voice Narration
+    function speakNarration(text) {
+      if (isMuted || !('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.05;
+      utterance.pitch = 1.02;
+      const voices = window.speechSynthesis.getVoices();
+      const preferred = voices.find(v => v.name.includes("Google") || v.name.includes("Zira") || v.lang.includes("en"));
+      if (preferred) utterance.voice = preferred;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // VIDEO RENDERING PIPELINE (Canvas 60fps)
+    // ─────────────────────────────────────────────────────────────────
+    function renderFrame(time) {
+      // Clear background
+      ctx.fillStyle = '#030712';
+      ctx.fillRect(0, 0, W, H);
+
+      // 1. Draw 3D Perspective Digital Floor Grid
+      ctx.save();
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.12)';
+      ctx.lineWidth = 1.5;
+      const horizonY = H * 0.65;
+      const vanishingX = W / 2;
+
+      for (let x = -W; x <= W * 2; x += 120) {
+        ctx.beginPath();
+        ctx.moveTo(vanishingX, horizonY);
+        ctx.lineTo(x, H);
+        ctx.stroke();
+      }
+      for (let y = horizonY; y <= H; y += Math.pow((y - horizonY) / 10, 1.4) + 14) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(W, y);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // 2. Draw Floating Particles
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0) p.x = W;
+        if (p.x > W) p.x = 0;
+        if (p.y < 0) p.y = H;
+        if (p.y > H) p.y = 0;
+
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1.0;
+
+      // Determine current scene
+      const sceneIndex = SCENES.findIndex(s => time >= s.start && time < s.end);
+      const activeIndex = sceneIndex !== -1 ? sceneIndex : SCENES.length - 1;
+      const currentScene = SCENES[activeIndex];
+
+      // Voice trigger on scene change
+      if (activeIndex !== lastSpokenScene && isPlaying) {
+        lastSpokenScene = activeIndex;
+        playCinematicImpact();
+        speakNarration(currentScene.speech);
+        updateSceneSelectorUI(activeIndex);
+      }
+
+      const sceneProgress = (time - currentScene.start) / (currentScene.end - currentScene.start);
+
+      // 3. Draw Scene Visual Elements
+      renderSceneGraphics(activeIndex, sceneProgress, time);
+
+      // 4. Draw Cinematic HUD Overlays (Letterbox & Title)
+      renderHUD(currentScene, sceneProgress, time);
+    }
+
+    // Scene Specific Visual Graphics
+    function renderSceneGraphics(index, progress, time) {
+      const centerX = W / 2;
+      const centerY = H / 2 - 40;
+
+      // Rotating glowing AI Core
+      ctx.save();
+      ctx.translate(centerX, centerY);
+
+      const pulse = 1 + Math.sin(time * 4) * 0.06;
+      const coreGrad = ctx.createRadialGradient(0, 0, 10, 0, 0, 200 * pulse);
+      coreGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+      coreGrad.addColorStop(0.25, 'rgba(56, 189, 248, 0.8)');
+      coreGrad.addColorStop(0.6, 'rgba(167, 139, 250, 0.4)');
+      coreGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+      ctx.fillStyle = coreGrad;
+      ctx.beginPath();
+      ctx.arc(0, 0, 200 * pulse, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Orbiting Neon Rings
+      for (let r = 0; r < 3; r++) {
+        ctx.save();
+        ctx.rotate((time * (r % 2 === 0 ? 1 : -1) * 0.7) + (r * 1.2));
+        ctx.strokeStyle = r === 0 ? '#38bdf8' : r === 1 ? '#a78bfa' : '#f472b6';
+        ctx.lineWidth = 3;
+        ctx.globalAlpha = 0.65;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 220 + r * 50, 90 + r * 30, (r * Math.PI) / 4, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+      ctx.restore();
+
+      // Scene-specific holographic floating cards
+      if (index === 0) {
+        drawHoloCard(centerX, centerY + 180, "JARVIS-INSPIRED ARCHITECTURE", "Offline Local AI • Windows 11 & Android 12", "#38bdf8");
+      } else if (index === 1) {
+        drawHoloCard(centerX, centerY + 180, "ZERO CLOUD TELEMETRY", "Qwen 2.5 3B • 100% On-Device Ollama Engine", "#34d399");
+      } else if (index === 2) {
+        drawHoloCard(centerX - 260, centerY + 160, "HARDWARE SENSORS", "CPU 12% • RAM 7.8GB • C: 380GB", "#38bdf8");
+        drawHoloCard(centerX + 260, centerY + 160, "SAFE APP LAUNCH", "VS Code • Notepad • Calc • Explorer", "#a78bfa");
+      } else if (index === 3) {
+        drawHoloCard(centerX, centerY + 180, "RTX 3050 4GB OPTIMIZED", "ComfyUI Local • SD 1.5 • Fast Synthesis", "#f472b6");
+      } else if (index === 4) {
+        drawHoloCard(centerX, centerY + 180, "WIREGUARD MESH", "Encrypted Tailscale Tunnel • Tasker Automation", "#34d399");
+      } else if (index === 5) {
+        drawHoloCard(centerX, centerY + 180, "READY TO DEPLOY", "git clone https://github.com/jsssameer7/jenni_ai", "#38bdf8");
+      }
+    }
+
+    function drawHoloCard(x, y, header, sub, accentColor) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      // Glass background
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+      ctx.strokeStyle = accentColor;
+      ctx.lineWidth = 1.5;
+
+      const cardW = 460;
+      const cardH = 90;
+      ctx.beginPath();
+      ctx.roundRect(-cardW / 2, -cardH / 2, cardW, cardH, 14);
+      ctx.fill();
+      ctx.stroke();
+
+      // Header text
+      ctx.fillStyle = accentColor;
+      ctx.font = '700 22px Outfit';
+      ctx.textAlign = 'center';
+      ctx.fillText(header, 0, -8);
+
+      // Sub text
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '500 16px Outfit';
+      ctx.fillText(sub, 0, 22);
+
+      ctx.restore();
+    }
+
+    function renderHUD(scene, progress, time) {
+      // Top bar badge
+      ctx.save();
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(80, 80, 260, 42, 21);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '700 15px "JetBrains Mono"';
+      ctx.textAlign = 'center';
+      ctx.fillText("JENNI AI // v1.0.0", 210, 107);
+
+      // Top right timecode
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 18px "JetBrains Mono"';
+      ctx.textAlign = 'right';
+      const secStr = Math.floor(time).toString().padStart(2, '0');
+      const msStr = Math.floor((time % 1) * 100).toString().padStart(2, '0');
+      ctx.fillText(`00:${secStr}:${msStr} / 00:${TOTAL_DURATION}:00`, W - 80, 108);
+
+      // Center Big Animated Title
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 68px Outfit';
+      ctx.shadowColor = 'rgba(56, 189, 248, 0.65)';
+      ctx.shadowBlur = 30;
+      ctx.fillText(scene.title, W / 2, H - 210);
+
+      // Subtitle
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '600 28px Outfit';
+      ctx.fillText(scene.subtitle, W / 2, H - 150);
+
+      // Sound Waveform Bars Indicator (Bottom)
+      const barCount = 48;
+      const barWidth = 6;
+      const barSpacing = 8;
+      const totalBarW = barCount * (barWidth + barSpacing);
+      const startX = (W - totalBarW) / 2;
+
+      for (let i = 0; i < barCount; i++) {
+        const height = isPlaying ? Math.abs(Math.sin(time * 8 + i * 0.35)) * 34 + 6 : 4;
+        const grad = ctx.createLinearGradient(0, H - 90, 0, H - 90 - height);
+        grad.addColorStop(0, '#38bdf8');
+        grad.addColorStop(1, '#a78bfa');
+        ctx.fillStyle = grad;
+        ctx.fillRect(startX + i * (barWidth + barSpacing), H - 85 - height, barWidth, height);
+      }
+
+      ctx.restore();
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // PLAYBACK CONTROLLER
+    // ─────────────────────────────────────────────────────────────────
+    function tick(timestamp) {
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      const delta = (timestamp - lastTimestamp) / 1000;
+      lastTimestamp = timestamp;
+
+      if (isPlaying) {
+        currentTime += delta;
+        if (currentTime >= TOTAL_DURATION) {
+          currentTime = TOTAL_DURATION;
+          pause();
+          if (isExporting) stopRecordingAndDownload();
+        }
+      }
+
+      renderFrame(currentTime);
+      updateHUD();
+
+      animationFrameId = requestAnimationFrame(tick);
+    }
+
+    function play() {
+      initAudio();
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      isPlaying = true;
+      document.getElementById('play-overlay').classList.add('hidden');
+      document.getElementById('play-icon').style.display = 'none';
+      document.getElementById('pause-icon').style.display = 'block';
+      startMusicLoop();
+    }
+
+    function pause() {
+      isPlaying = false;
+      document.getElementById('play-icon').style.display = 'block';
+      document.getElementById('pause-icon').style.display = 'none';
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      if (synthInterval) clearInterval(synthInterval);
+    }
+
+    function togglePlay() {
+      if (isPlaying) pause();
+      else {
+        if (currentTime >= TOTAL_DURATION) currentTime = 0;
+        play();
+      }
+    }
+
+    function replay() {
+      currentTime = 0;
+      lastSpokenScene = -1;
+      play();
+    }
+
+    function jumpToTime(seconds) {
+      currentTime = seconds;
+      lastSpokenScene = -1;
+      renderFrame(currentTime);
+      updateHUD();
+      if (!isPlaying) play();
+    }
+
+    function updateHUD() {
+      const fillPct = (currentTime / TOTAL_DURATION) * 100;
+      document.getElementById('timeline-fill').style.width = `${fillPct}%`;
+
+      const curSec = Math.floor(currentTime);
+      document.getElementById('current-time-text').textContent = `0:${curSec < 10 ? '0' : ''}${curSec}`;
+
+      const activeScene = SCENES.find(s => currentTime >= s.start && currentTime < s.end) || SCENES[SCENES.length - 1];
+      document.getElementById('current-scene-badge').textContent = activeScene.badge;
+    }
+
+    function updateSceneSelectorUI(idx) {
+      const cards = document.querySelectorAll('.scene-card');
+      cards.forEach((c, i) => c.classList.toggle('active', i === idx));
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // VIDEO EXPORT / DOWNLOAD (.webm / .mp4 MediaRecorder)
+    // ─────────────────────────────────────────────────────────────────
+    function startRecordingVideo() {
+      initAudio();
+      recordedChunks = [];
+      isExporting = true;
+
+      // 60FPS Canvas Stream
+      const canvasStream = canvas.captureStream(60);
+
+      // Combine audio if available
+      let combinedStream = canvasStream;
+      if (audioDestination && audioDestination.stream.getAudioTracks().length > 0) {
+        const audioTrack = audioDestination.stream.getAudioTracks()[0];
+        combinedStream.addTrack(audioTrack);
+      }
+
+      let options = { mimeType: 'video/webm;codecs=vp9,opus' };
+      if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+        options = { mimeType: 'video/webm' };
+      }
+
+      try {
+        mediaRecorder = new MediaRecorder(combinedStream, options);
+      } catch (e) {
+        mediaRecorder = new MediaRecorder(combinedStream);
+      }
+
+      mediaRecorder.ondataavailable = e => {
+        if (e.data.size > 0) recordedChunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Jenni_AI_Official_Promo_Video.webm`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        isExporting = false;
+        const btn = document.getElementById('export-video-btn');
+        btn.classList.remove('recording');
+        document.getElementById('rec-btn-text').textContent = 'Download Video';
+        alert('🎉 Promo video generated and downloaded successfully!');
+      };
+
+      const btn = document.getElementById('export-video-btn');
+      btn.classList.add('recording');
+      document.getElementById('rec-btn-text').textContent = 'Recording Video...';
+
+      // Reset to beginning and play full video
+      currentTime = 0;
+      lastSpokenScene = -1;
+      mediaRecorder.start();
+      play();
+    }
+
+    function stopRecordingAndDownload() {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // EVENT LISTENERS & SETUP
+    // ─────────────────────────────────────────────────────────────────
+    document.getElementById('start-btn').addEventListener('click', play);
+    document.getElementById('toggle-play-btn').addEventListener('click', togglePlay);
+    document.getElementById('replay-btn').addEventListener('click', replay);
+
+    document.getElementById('mute-btn').addEventListener('click', () => {
+      isMuted = !isMuted;
+      document.getElementById('mute-btn').style.opacity = isMuted ? '0.4' : '1.0';
+      if (isMuted && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+    });
+
+    // Timeline Scrubbing
+    const timelineBar = document.getElementById('timeline-bar');
+    timelineBar.addEventListener('click', e => {
+      const rect = timelineBar.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const pct = Math.max(0, Math.min(1, clickX / rect.width));
+      jumpToTime(pct * TOTAL_DURATION);
+    });
+
+    document.getElementById('export-video-btn').addEventListener('click', () => {
+      if (isExporting) {
+        stopRecordingAndDownload();
+      } else {
+        startRecordingVideo();
+      }
+    });
+
+    // Spacebar to play/pause
+    document.addEventListener('keydown', e => {
+      if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
+        e.preventDefault();
+        togglePlay();
+      }
+    });
+
+    // Initial render
+    renderFrame(0);
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>

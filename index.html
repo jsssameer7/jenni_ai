@@ -8,31 +8,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="frontend/landing.css">
-  <style>
-    /* GitHub Pages notice banner */
-    .gh-notice {
-      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-      background: rgba(13,17,23,0.95); border: 1px solid rgba(56,189,248,0.3);
-      border-radius: 100px; padding: 10px 22px;
-      font-family: 'Outfit', sans-serif; font-size: 0.82rem;
-      color: #94a3b8; z-index: 9999;
-      display: flex; align-items: center; gap: 10px;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-      white-space: nowrap;
-    }
-    .gh-notice span.dot { width: 7px; height: 7px; border-radius: 50%; background: #38bdf8; flex-shrink: 0; animation: blink2 2s ease-in-out infinite; }
-    @keyframes blink2 { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    .gh-notice a { color: #38bdf8; text-decoration: none; }
-    .gh-notice a:hover { text-decoration: underline; }
-  </style>
+  <link rel="stylesheet" href="/static/landing.css">
 </head>
 <body>
   <!-- Navigation -->
   <nav class="navbar" id="navbar">
     <div class="nav-inner">
-      <a href="#" class="nav-brand">
+      <a href="/" class="nav-brand">
         <div class="nav-orb"><div class="nav-orb-inner"></div></div>
         <span>Jenni AI</span>
       </a>
@@ -41,7 +23,8 @@
         <a href="#how-it-works">How it works</a>
         <a href="#specs">Specs</a>
         <a href="#android">Android</a>
-        <a href="https://github.com/jsssameer7/jenni_ai" target="_blank" class="nav-cta-btn">View on GitHub</a>
+        <a href="/ad" style="color: #38bdf8; font-weight: 600;">Ad Video</a>
+        <a href="/login" class="nav-cta-btn">Sign In</a>
       </div>
       <button class="mobile-nav-toggle" id="mobile-nav-toggle" aria-label="Toggle menu">
         <span></span><span></span><span></span>
@@ -53,9 +36,9 @@
     <a href="#how-it-works" onclick="closeMobileMenu()">How it works</a>
     <a href="#specs" onclick="closeMobileMenu()">Specs</a>
     <a href="#android" onclick="closeMobileMenu()">Android</a>
-    <a href="https://github.com/jsssameer7/jenni_ai" target="_blank" class="mobile-cta">View on GitHub</a>
+    <a href="/ad" onclick="closeMobileMenu()">Ad Video</a>
+    <a href="/app" class="mobile-cta">Open Dashboard</a>
   </div>
-
   <!-- Hero Section -->
   <section class="hero" id="hero">
     <div class="hero-bg">
@@ -66,14 +49,12 @@
     </div>
     <div class="hero-layout">
       <div class="hero-content">
-        <div class="hero-badge"><span class="badge-dot"></span><span>v1.0 &bull; Runs locally on your PC</span></div>
+        <div class="hero-badge"><span class="badge-dot"></span><span>v1.0 &bull; Running locally on your PC</span></div>
         <h1 class="hero-title">Meet <span class="gradient-text">Jenni AI</span><br>Your Personal<br>Intelligent Assistant</h1>
         <p class="hero-subtitle">A Jarvis-inspired AI assistant built for Windows 11 and Android 12. Chat naturally, control your PC, remember your preferences, generate images, and automate tasks &mdash; entirely offline, entirely yours.</p>
         <div class="hero-actions">
-          <a href="https://github.com/jsssameer7/jenni_ai" target="_blank" class="btn-hero-primary">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-            Clone &amp; Run Locally
-          </a>
+          <a href="/app" class="btn-hero-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>Launch Dashboard</a>
+          <a href="/ad" class="btn-hero-secondary" style="border-color: rgba(56,189,248,0.4); color: var(--cyan);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>Watch Trailer</a>
           <a href="#features" class="btn-hero-secondary">Explore Features<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
         </div>
         <div class="hero-stats">
@@ -102,9 +83,9 @@
               <div class="mockup-nav-item"></div>
             </div>
             <div class="mockup-chat">
-              <div class="mockup-msg user"><div>How can you help me today?</div></div>
+              <div class="mockup-msg user">How can you help me today?</div>
               <div class="mockup-msg jenni"><div class="mockup-avatar">JA</div><div>Hello! I can launch apps, search files, remember preferences, and automate workflows!</div></div>
-              <div class="mockup-msg user"><div>Open VS Code please</div></div>
+              <div class="mockup-msg user">Open VS Code please</div>
               <div class="mockup-msg jenni"><div class="mockup-avatar">JA</div><div>&#10003; VS Code launched on your PC!</div></div>
             </div>
           </div>
@@ -113,20 +94,18 @@
     </div>
     <div class="hero-scroll-hint"><span>Scroll to explore</span><div class="scroll-arrow"></div></div>
   </section>
-
   <!-- Status Banner -->
   <section class="status-banner">
     <div class="container">
       <div class="status-items">
-        <div class="status-item"><div class="ping green"></div><span>Ollama qwen2.5:3b &mdash; Local Inference</span></div>
-        <div class="status-item"><div class="ping cyan"></div><span>FastAPI Backend &mdash; Python</span></div>
-        <div class="status-item"><div class="ping violet"></div><span>MongoDB &mdash; Persistent Storage</span></div>
-        <div class="status-item"><div class="ping green"></div><span>Tailscale Mesh &mdash; Encrypted</span></div>
+        <div class="status-item"><div class="ping green"></div><span>Ollama qwen2.5:3b &mdash; Active</span></div>
+        <div class="status-item"><div class="ping cyan"></div><span>FastAPI Backend &mdash; Running</span></div>
+        <div class="status-item"><div class="ping violet"></div><span>MongoDB &mdash; Persistent</span></div>
+        <div class="status-item"><div class="ping green"></div><span>Tailscale Mesh &mdash; Connected</span></div>
         <div class="status-item"><div class="ping yellow"></div><span>ComfyUI &mdash; 4GB VRAM Ready</span></div>
       </div>
     </div>
   </section>
-
   <!-- Features Section -->
   <section class="features-section" id="features">
     <div class="container">
@@ -169,8 +148,8 @@
         <div class="feature-card large" data-color="violet">
           <div class="feature-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
           <h3>Image Studio</h3>
-          <p>Integrates with local <strong>ComfyUI</strong> for Stable Diffusion. Detects your <strong>NVIDIA RTX 3050 (4 GB VRAM)</strong> and recommends SD 1.5 / SD-Turbo with --lowvram mode.</p>
-          <div class="feature-chips"><span class="feature-chip">ComfyUI API</span><span class="feature-chip">VRAM Aware</span><span class="feature-chip">Offline Fallback</span></div>
+          <p>Integrates with local <strong>ComfyUI</strong> and cloud neural synthesis for Stable Diffusion. Detects your <strong>NVIDIA RTX 3050 (4 GB VRAM)</strong> and optimizes generation.</p>
+          <div class="feature-chips"><span class="feature-chip">ComfyUI API</span><span class="feature-chip">VRAM Aware</span><span class="feature-chip">Neural Flux Engine</span></div>
         </div>
         <div class="feature-card" data-color="green">
           <div class="feature-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
@@ -187,7 +166,6 @@
       </div>
     </div>
   </section>
-
   <!-- How It Works -->
   <section class="how-it-works" id="how-it-works">
     <div class="container">
@@ -199,12 +177,11 @@
         <div class="steps-line"></div>
         <div class="step"><div class="step-num">01</div><div class="step-card"><div class="step-icon">&#129504;</div><h3>Local AI Brain</h3><p>Ollama runs <strong>qwen2.5:3b</strong> (1.9 GB) entirely on your PC. Every conversation is private.</p></div></div>
         <div class="step"><div class="step-num">02</div><div class="step-card"><div class="step-icon">&#9889;</div><h3>FastAPI Backend</h3><p>A Python FastAPI server exposes 12+ secure REST endpoints for chat, memory, PC control, and more.</p></div></div>
-        <div class="step"><div class="step-num">03</div><div class="step-card"><div class="step-icon">&#128187;</div><h3>Web Dashboard</h3><p>A modern dark-themed interface served directly by the backend. Login with your account and start chatting.</p></div></div>
+        <div class="step"><div class="step-num">03</div><div class="step-card"><div class="step-icon">&#128187;</div><h3>Web Dashboard</h3><p>A modern dark-themed interface served directly by the backend. Open your browser and it just works.</p></div></div>
         <div class="step"><div class="step-num">04</div><div class="step-card"><div class="step-icon">&#128241;</div><h3>Android Access</h3><p>Your Android phone connects via Tailscale encrypted mesh. Install as a fullscreen PWA from Chrome in one tap.</p></div></div>
       </div>
     </div>
   </section>
-
   <!-- Tech Stack -->
   <section class="tech-section" id="specs">
     <div class="container">
@@ -216,8 +193,8 @@
         <div class="tech-card"><div class="tech-logo">&#129422;</div><div class="tech-name">Ollama</div><div class="tech-desc">Local LLM inference</div></div>
         <div class="tech-card"><div class="tech-logo">&#129302;</div><div class="tech-name">Qwen2.5 3B</div><div class="tech-desc">AI language model</div></div>
         <div class="tech-card"><div class="tech-logo">&#9889;</div><div class="tech-name">FastAPI</div><div class="tech-desc">Python REST backend</div></div>
-        <div class="tech-card"><div class="tech-logo">&#128343;</div><div class="tech-name">MongoDB</div><div class="tech-desc">Persistent storage</div></div>
-        <div class="tech-card"><div class="tech-logo">&#127912;</div><div class="tech-name">ComfyUI</div><div class="tech-desc">Local image gen</div></div>
+        <div class="tech-card"><div class="tech-logo">&#128451;</div><div class="tech-name">MongoDB</div><div class="tech-desc">Unified authentication & storage</div></div>
+        <div class="tech-card"><div class="tech-logo">&#127912;</div><div class="tech-name">ComfyUI / Flux</div><div class="tech-desc">Neural image synthesis</div></div>
         <div class="tech-card"><div class="tech-logo">&#128274;</div><div class="tech-name">Tailscale</div><div class="tech-desc">Encrypted networking</div></div>
         <div class="tech-card"><div class="tech-logo">&#127897;</div><div class="tech-name">Web Speech API</div><div class="tech-desc">Browser STT</div></div>
         <div class="tech-card"><div class="tech-logo">&#128013;</div><div class="tech-name">Python 3.15</div><div class="tech-desc">Backend runtime</div></div>
@@ -236,7 +213,6 @@
       </div>
     </div>
   </section>
-
   <!-- Android Section -->
   <section class="android-section" id="android">
     <div class="container">
@@ -248,18 +224,15 @@
           <div class="android-steps">
             <div class="android-step"><div class="android-step-num">1</div><div>Install <strong>Tailscale</strong> on your laptop and Android phone</div></div>
             <div class="android-step"><div class="android-step-num">2</div><div>Sign in with the same account on both devices</div></div>
-            <div class="android-step"><div class="android-step-num">3</div><div>Run <code>run_windows.bat</code> to start Jenni AI on your PC</div></div>
-            <div class="android-step"><div class="android-step-num">4</div><div>Open Chrome on Android → visit your PC's Tailscale IP:8000 → tap <strong>"Add to Home Screen"</strong></div></div>
+            <div class="android-step"><div class="android-step-num">3</div><div>Open Chrome on Android: <code>http://100.102.38.116:8000/login</code></div></div>
+            <div class="android-step"><div class="android-step-num">4</div><div>Tap <strong>"Add to Home Screen"</strong> to install as a PWA app</div></div>
           </div>
           <div class="tailscale-info">
-            <div class="ts-node"><div class="ts-icon">&#128187;</div><div class="ts-label">Laptop</div><div class="ts-ip">100.x.x.x</div></div>
+            <div class="ts-node"><div class="ts-icon">&#128187;</div><div class="ts-label">Laptop</div><div class="ts-ip">100.102.38.116</div></div>
             <div class="ts-arrow"><svg viewBox="0 0 80 24" fill="none"><path d="M2 12 Q20 4 40 12 Q60 20 78 12" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="4 2"/><polygon points="72,9 80,12 72,15" fill="#38bdf8"/></svg><div class="ts-label-mid">Tailscale WireGuard</div></div>
-            <div class="ts-node"><div class="ts-icon">&#128241;</div><div class="ts-label">Android</div><div class="ts-ip">100.x.x.x</div></div>
+            <div class="ts-node"><div class="ts-icon">&#128241;</div><div class="ts-label">Android</div><div class="ts-ip">100.74.215.8</div></div>
           </div>
-          <a href="https://github.com/jsssameer7/jenni_ai" target="_blank" class="btn-hero-primary" style="margin-top:28px;display:inline-flex;">
-            View on GitHub
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
+          <a href="/app" class="btn-hero-primary" style="margin-top:28px;display:inline-flex;">Open Jenni AI Dashboard<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         </div>
         <div class="phone-mockup-wrapper">
           <div class="phone-mockup">
@@ -279,7 +252,6 @@
       </div>
     </div>
   </section>
-
   <!-- Security Section -->
   <section class="security-section">
     <div class="container">
@@ -294,55 +266,37 @@
           <div class="sec-card"><div class="sec-icon">&#128737;</div><h4>Allowlist Execution</h4><p>Only pre-approved applications and websites can be launched. No arbitrary shell commands.</p></div>
           <div class="sec-card"><div class="sec-icon">&#128193;</div><h4>Path Traversal Guard</h4><p>File access is confined to explicitly approved directories. System folders are inaccessible.</p></div>
           <div class="sec-card"><div class="sec-icon">&#9989;</div><h4>Confirmation Gateway</h4><p>All sensitive PC actions require your explicit approval before execution.</p></div>
-          <div class="sec-card"><div class="sec-icon">&#128274;</div><h4>User Auth System</h4><p>Login page with hashed passwords, session tokens, and MongoDB-backed sessions.</p></div>
+          <div class="sec-card"><div class="sec-icon">&#128274;</div><h4>Token Auth for Remote</h4><p>Remote access from your phone requires a secret token. Local access is automatically trusted.</p></div>
           <div class="sec-card"><div class="sec-icon">&#128535;</div><h4>No Internet Required</h4><p>Jenni AI runs fully offline. Ollama, MongoDB, and all core features work without internet.</p></div>
         </div>
       </div>
     </div>
   </section>
-
   <!-- CTA Section -->
   <section class="cta-section">
     <div class="cta-glow"></div>
     <div class="container">
       <div class="cta-inner">
         <h2>Ready to meet<br><span class="gradient-text">Jenni AI</span>?</h2>
-        <p>Clone the repo, run one script, and your local AI assistant is live in minutes.</p>
+        <p>Your local AI assistant is already running and waiting for you.</p>
         <div class="cta-actions">
-          <a href="https://github.com/jsssameer7/jenni_ai" target="_blank" class="btn-hero-primary large">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-            View on GitHub
-          </a>
+          <a href="/app" class="btn-hero-primary large"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>Open Jenni AI Dashboard</a>
+          <a href="https://github.com/jsssameer7/jenni_ai" target="_blank" class="btn-hero-secondary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>View on GitHub</a>
         </div>
-        <div class="cta-tip"><span>&#128161;</span><span>Run <code>run_windows.bat</code> or <code>python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000</code></span></div>
+        <div class="cta-tip"><span>&#128161;</span><span>Start with <code>run_windows.bat</code> or <code>python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000</code></span></div>
       </div>
     </div>
   </section>
-
   <!-- Footer -->
   <footer class="site-footer">
     <div class="container">
       <div class="footer-inner">
         <div class="footer-brand"><div class="nav-orb small"><div class="nav-orb-inner"></div></div><span>Jenni AI</span></div>
-        <div class="footer-links">
-          <a href="#features">Features</a>
-          <a href="#how-it-works">How it works</a>
-          <a href="#android">Android</a>
-          <a href="https://github.com/jsssameer7/jenni_ai" target="_blank">GitHub</a>
-        </div>
-        <div class="footer-copy">Built with &hearts; for your privacy &bull; Jenni AI v1.0.0</div>
+        <div class="footer-links"><a href="#features">Features</a><a href="#how-it-works">How it works</a><a href="#android">Android</a><a href="/ad">Ad Video</a><a href="/app">Dashboard</a><a href="https://github.com/jsssameer7/jenni_ai" target="_blank">GitHub</a></div>
+        <div class="footer-copy">Built with &hearts; for your privacy &bull; Jenni AI v1.0.0 &bull; Running on Windows 11</div>
       </div>
     </div>
   </footer>
-
-  <!-- GitHub Pages notice -->
-  <div class="gh-notice" id="gh-notice">
-    <span class="dot"></span>
-    This is a <strong style="color:#e2e8f0">static preview</strong>. The AI chat runs locally —
-    <a href="https://github.com/jsssameer7/jenni_ai" target="_blank">clone &amp; run</a> on your PC.
-    <button onclick="document.getElementById('gh-notice').remove()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:1rem;line-height:1;margin-left:6px;">✕</button>
-  </div>
-
   <script>
     const navbar = document.getElementById('navbar');
     window.addEventListener('scroll', () => { navbar.classList.toggle('scrolled', window.scrollY > 60); });

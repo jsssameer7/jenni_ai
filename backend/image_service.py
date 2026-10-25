@@ -2,6 +2,7 @@ import httpx
 import json
 import uuid
 import os
+import urllib.parse
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from datetime import datetime
@@ -66,13 +67,13 @@ class ImageService:
             "online": False,
             "url": settings.COMFYUI_URL,
             "gpu": gpu,
-            "message": "ComfyUI is not currently running. Jenni AI will use high-quality creative synthesis fallback or wait for ComfyUI."
+            "message": "ComfyUI is not currently running. Jenni AI will use photorealistic AI synthesis (Flux / SD)."
         }
 
     @staticmethod
     def generate_creative_artwork(prompt: str, width: int = 768, height: int = 512) -> str:
         """
-        Creates a futuristic neural generative artwork card when ComfyUI is offline or low-vram fallback is engaged.
+        Creates an offline futuristic generative artwork card if network and ComfyUI are both unavailable.
         """
         filename = f"jenni_art_{uuid.uuid4().hex[:8]}.png"
         filepath = settings.IMAGES_PATH / filename
@@ -101,7 +102,7 @@ class ImageService:
         clean_prompt = prompt if len(prompt) < 70 else prompt[:67] + "..."
         draw.text((50, height - 105), f"Jenni AI Studio — Visual Concept", fill=(168, 85, 247))
         draw.text((50, height - 80), f'"{clean_prompt}"', fill=(240, 245, 255))
-        draw.text((50, height - 55), "Engine: Jenni AI Visual Synth (Connect ComfyUI for SD 1.5 diffusion)", fill=(148, 163, 184))
+        draw.text((50, height - 55), "Engine: Jenni AI Visual Synth", fill=(148, 163, 184))
 
         img.save(str(filepath))
         return filename
@@ -109,15 +110,16 @@ class ImageService:
     @staticmethod
     async def generate_image(prompt: str, width: int = 512, height: int = 512) -> Dict[str, Any]:
         """
-        Attempts to generate image using ComfyUI. If ComfyUI is unavailable, uses visual fallback.
+        1. If ComfyUI is active locally, uses local SD 1.5.
+        2. Otherwise, generates photorealistic AI image via Flux / SD engine.
+        3. Falls back to offline visual synth if no network.
         """
         gpu = ImageService.get_gpu_vram()
         comfy_status = await ImageService.check_comfyui_status()
 
+        # 1. ComfyUI Local Pipeline
         if comfy_status["online"]:
-            # ComfyUI is running! Send default txt2img workflow
             try:
-                # Standard SD1.5 txt2img workflow prompt dict
                 workflow = {
                     "3": {
                         "inputs": {
@@ -172,18 +174,38 @@ class ImageService:
                             "message": "Prompt submitted to ComfyUI successfully.",
                             "gpu": gpu
                         }
-            except Exception as e:
-                # ComfyUI returned an error during submission
+            except Exception:
                 pass
 
-        # Fallback generator
+        # 2. Photorealistic AI image generation (Flux / SD)
+        try:
+            encoded_prompt = urllib.parse.quote(prompt.strip())
+            pollinations_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&nologo=true&model=flux"
+            async with httpx.AsyncClient(timeout=35.0, follow_redirects=True) as client:
+                res = await client.get(pollinations_url)
+                if res.status_code == 200 and len(res.content) > 1000:
+                    filename = f"jenni_ai_{uuid.uuid4().hex[:8]}.png"
+                    filepath = settings.IMAGES_PATH / filename
+                    filepath.write_bytes(res.content)
+                    return {
+                        "success": True,
+                        "mode": "neural_ai",
+                        "filename": filename,
+                        "url": f"/api/images/{filename}",
+                        "message": f"Real AI image generated successfully for '{prompt}'.",
+                        "gpu": gpu
+                    }
+        except Exception:
+            pass
+
+        # 3. Offline Fallback generator
         filename = ImageService.generate_creative_artwork(prompt, width=width, height=height)
         return {
             "success": True,
             "mode": "fallback_synth",
             "filename": filename,
             "url": f"/api/images/{filename}",
-            "message": "Image generated using Jenni AI Visual Synth. (For Stable Diffusion, start ComfyUI at http://127.0.0.1:8188)",
+            "message": "Visual concept synthesized.",
             "gpu": gpu
         }
 
