@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jenni AI — Official Video Trailer & Commercial</title>
+  <title>Jenni AI — Official Video Trailer: PC & Mobile Integration</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -36,14 +36,14 @@
       padding: 16px;
     }
 
-    /* Ambient background */
+    /* Ambient background glowing orbs */
     .glow-sphere {
       position: fixed;
-      width: 600px;
-      height: 600px;
+      width: 650px;
+      height: 650px;
       border-radius: 50%;
-      filter: blur(140px);
-      opacity: 0.15;
+      filter: blur(150px);
+      opacity: 0.16;
       pointer-events: none;
       z-index: 0;
     }
@@ -54,11 +54,11 @@
       position: relative;
       z-index: 10;
       width: 100%;
-      max-width: 1100px;
+      max-width: 1150px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .brand-logo {
@@ -94,18 +94,18 @@
     }
     .back-btn:hover { color: var(--cyan); }
 
-    /* Video Player Container */
+    /* Video Player Viewport Container */
     .player-container {
       position: relative;
       z-index: 10;
       width: 100%;
-      max-width: 1100px;
+      max-width: 1150px;
       aspect-ratio: 16 / 9;
-      background: #000;
+      background: #02040a;
       border-radius: 20px;
       overflow: hidden;
       border: 1px solid var(--border);
-      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8), 0 0 50px rgba(56, 189, 248, 0.15);
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.85), 0 0 50px rgba(56, 189, 248, 0.18);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -118,17 +118,17 @@
       object-fit: contain;
     }
 
-    /* Start / Big Play Overlay */
+    /* Start Overlay */
     .play-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(3, 7, 18, 0.75);
+      background: rgba(3, 7, 18, 0.78);
       backdrop-filter: blur(8px);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 20px;
+      gap: 18px;
       z-index: 20;
       transition: opacity 0.3s ease, visibility 0.3s;
     }
@@ -156,22 +156,18 @@
       transform: scale(1.08);
       box-shadow: 0 0 60px rgba(56, 189, 248, 0.85);
     }
-    .big-play-btn svg {
-      width: 40px;
-      height: 40px;
-      margin-left: 5px;
-    }
+    .big-play-btn svg { width: 40px; height: 40px; margin-left: 5px; }
 
     .play-overlay h2 {
-      font-size: 1.8rem;
+      font-size: 2rem;
       font-weight: 800;
       letter-spacing: -0.02em;
       text-align: center;
     }
     .play-overlay p {
-      font-size: 0.95rem;
+      font-size: 0.98rem;
       color: var(--text-muted);
-      max-width: 480px;
+      max-width: 520px;
       text-align: center;
       line-height: 1.5;
     }
@@ -181,7 +177,7 @@
       position: relative;
       z-index: 10;
       width: 100%;
-      max-width: 1100px;
+      max-width: 1150px;
       margin-top: 14px;
       background: var(--surface);
       border: 1px solid var(--border);
@@ -244,7 +240,7 @@
 
     .scene-pill {
       font-size: 0.78rem;
-      padding: 4px 10px;
+      padding: 3px 10px;
       border-radius: 20px;
       background: rgba(56, 189, 248, 0.12);
       color: var(--cyan);
@@ -303,15 +299,15 @@
     }
     .cta-btn:hover { transform: translateY(-1px); }
 
-    /* Scene jump selector */
+    /* Scene Jump Cards */
     .scene-selector {
       position: relative;
       z-index: 10;
       width: 100%;
-      max-width: 1100px;
+      max-width: 1150px;
       margin-top: 14px;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
       gap: 8px;
     }
     .scene-card {
@@ -363,7 +359,7 @@
     </a>
   </header>
 
-  <!-- Video Viewport Canvas -->
+  <!-- Video Viewport Canvas (1920x1080 Native High-Def) -->
   <div class="player-container" id="player-container">
     <canvas id="video-canvas" width="1920" height="1080"></canvas>
 
@@ -372,8 +368,8 @@
       <button class="big-play-btn" id="start-btn" title="Play Commercial">
         <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
       </button>
-      <h2>Meet Jenni AI</h2>
-      <p>A cinematic product showcase: 100% private offline intelligence, native Windows 11 hardware controls, creative image studio, and seamless Android mesh.</p>
+      <h2>Jenni AI — PC & Mobile Synergy</h2>
+      <p>Watch how Windows 11 PC control, local Ollama intelligence, and Android 12 mesh connectivity work together in real-time.</p>
     </div>
   </div>
 
@@ -397,7 +393,7 @@
       <div class="time-label">
         <span id="current-time-text">0:00</span>
         <span class="scene-pill" id="current-scene-badge">Scene 1: Introduction</span>
-        <span id="duration-text">0:32</span>
+        <span id="duration-text">0:36</span>
       </div>
     </div>
 
@@ -417,25 +413,25 @@
   <div class="scene-selector" id="scene-selector">
     <div class="scene-card active" onclick="jumpToTime(0)">
       <div class="s-num">01 / 06</div>
-      <div class="s-title">Next-Gen Assistant</div>
+      <div class="s-title">Dual-Device Ecosystem</div>
     </div>
-    <div class="scene-card" onclick="jumpToTime(5)">
+    <div class="scene-card" onclick="jumpToTime(6)">
       <div class="s-num">02 / 06</div>
-      <div class="s-title">100% Private & Local</div>
+      <div class="s-title">QR Code Mesh Tunnel</div>
     </div>
-    <div class="scene-card" onclick="jumpToTime(10)">
+    <div class="scene-card" onclick="jumpToTime(12)">
       <div class="s-num">03 / 06</div>
-      <div class="s-title">Total PC Control</div>
+      <div class="s-title">Remote PC Control</div>
     </div>
-    <div class="scene-card" onclick="jumpToTime(16)">
+    <div class="scene-card" onclick="jumpToTime(18)">
       <div class="s-num">04 / 06</div>
       <div class="s-title">Neural Image Studio</div>
     </div>
-    <div class="scene-card" onclick="jumpToTime(22)">
+    <div class="scene-card" onclick="jumpToTime(24)">
       <div class="s-num">05 / 06</div>
-      <div class="s-title">Android 12 Mesh</div>
+      <div class="s-title">Zero-Cloud Security</div>
     </div>
-    <div class="scene-card" onclick="jumpToTime(27)">
+    <div class="scene-card" onclick="jumpToTime(30)">
       <div class="s-num">06 / 06</div>
       <div class="s-title">Get Started Today</div>
     </div>
@@ -443,7 +439,8 @@
 
   <script>
     // ═════════════════════════════════════════════════════════════════════
-    // JENNI AI COMMERCIAL VIDEO ENGINE (Canvas 60fps + WebAudio + Recorder)
+    // JENNI AI HIGH-PRODUCTION COMMERCIAL ENGINE
+    // PC UI + MOBILE UI + LIVE CONNECTIVITY MESH
     // ═════════════════════════════════════════════════════════════════════
 
     const canvas = document.getElementById('video-canvas');
@@ -451,7 +448,7 @@
     const W = 1920;
     const H = 1080;
 
-    const TOTAL_DURATION = 32; // Seconds
+    const TOTAL_DURATION = 36; // 36 Seconds Cinematic Ad
     let currentTime = 0;
     let isPlaying = false;
     let isMuted = false;
@@ -468,76 +465,73 @@
     let synthInterval = null;
     let audioDestination = null;
 
-    // Narrative Voice Over Script
+    // 6 Cinematic Scenes detailing PC UI, Mobile UI, and Connectivity
     const SCENES = [
       {
         start: 0,
-        end: 5,
+        end: 6,
         title: "MEET JENNI AI",
-        subtitle: "The Future of Personal Computing",
-        speech: "Meet Jenni AI. Your intelligent, Jarvis-inspired personal assistant built for Windows 11 and Android.",
-        badge: "01: The Future of Personal Computing"
+        subtitle: "Bridging Windows 11 PC & Android 12 Phone",
+        speech: "Meet Jenni AI. Your personal, intelligent assistant uniting your Windows 11 workstation and Android phone into one synchronized ecosystem.",
+        badge: "01: Dual-Device Ecosystem"
       },
       {
-        start: 5,
-        end: 10,
-        title: "100% PRIVATE & OFFLINE",
-        subtitle: "Zero Cloud Dependencies • Qwen 2.5 LLM",
-        speech: "Powered locally by Ollama. No subscription fees, zero cloud surveillance, and completely private on your machine.",
-        badge: "02: 100% Private & Offline"
+        start: 6,
+        end: 12,
+        title: "INSTANT QR MESH PAIRING",
+        subtitle: "Encrypted WireGuard Tunnel • 100.102.38.116 ↔ 100.74.215.8",
+        speech: "Pair in seconds. Simply scan the QR code from your phone's camera to establish an encrypted, zero-configuration WireGuard mesh.",
+        badge: "02: QR Code Mesh Tunnel"
       },
       {
-        start: 10,
-        end: 16,
-        title: "TOTAL PC AUTOMATION",
-        subtitle: "Hardware Monitoring • Safe App Execution",
-        speech: "Control your desktop with safe approvals. Launch VS Code, Notepad, monitor your GPU, and automate workflows effortlessly.",
-        badge: "03: Total PC Automation"
+        start: 12,
+        end: 18,
+        title: "CROSS-DEVICE PC AUTOMATION",
+        subtitle: "Speak on Phone → Instant Desktop Execution",
+        speech: "Speak into your phone to trigger real desktop actions. Launch VS Code, Notepad, monitor your GPU, and manage files remotely with zero latency.",
+        badge: "03: Remote PC Control"
       },
       {
-        start: 16,
-        end: 22,
-        title: "CREATIVE NEURAL STUDIO",
-        subtitle: "ComfyUI & Generative Art on RTX 3050",
-        speech: "Synthesize high-resolution creative artwork directly on your graphics card with custom prompt controls.",
-        badge: "04: Creative Neural Studio"
+        start: 18,
+        end: 24,
+        title: "LOCAL GPU CREATIVE STUDIO",
+        subtitle: "RTX 3050 Acceleration • Live Mobile Sync",
+        speech: "Create photorealistic AI imagery with local graphics card acceleration. Generated artworks sync immediately to your mobile gallery.",
+        badge: "04: Neural Image Studio"
       },
       {
-        start: 22,
-        end: 27,
-        title: "UNIFIED MOBILE MESH",
-        subtitle: "WireGuard & Tailscale Encrypted Tunnel",
-        speech: "Scan a single QR code to carry Jenni AI in your pocket with Android 12 phone and Tasker integration.",
-        badge: "05: Unified Android Mesh"
+        start: 24,
+        end: 30,
+        title: "100% PRIVATE & CLOUD-FREE",
+        subtitle: "Offline Ollama LLM • MongoDB Session Auth",
+        speech: "No cloud subscriptions. No third-party data tracking. All intelligence runs privately on your own hardware.",
+        badge: "05: Zero-Cloud Security"
       },
       {
-        start: 27,
-        end: 32,
+        start: 30,
+        end: 36,
         title: "JENNI AI",
         subtitle: "Your Machine. Your Intelligence. Your Assistant.",
-        speech: "Experience the next generation of personal AI. Launch Jenni AI today on GitHub.",
+        speech: "Experience seamless PC and mobile intelligence today. Launch Jenni AI from GitHub.",
         badge: "06: Get Started Today"
       }
     ];
 
     let lastSpokenScene = -1;
 
-    // Particles system
-    const particles = [];
-    for (let i = 0; i < 90; i++) {
-      particles.push({
-        x: Math.random() * W,
-        y: Math.random() * H,
-        vx: (Math.random() - 0.5) * 1.2,
-        vy: (Math.random() - 0.5) * 1.2,
-        size: Math.random() * 3 + 1,
-        color: ['#38bdf8', '#a78bfa', '#f472b6', '#34d399'][Math.floor(Math.random() * 4)],
-        alpha: Math.random() * 0.7 + 0.3
-      });
-    }
+    // Background floating particles
+    const particles = Array.from({ length: 90 }, () => ({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 1.4,
+      vy: (Math.random() - 0.5) * 1.4,
+      size: Math.random() * 3 + 1,
+      color: ['#38bdf8', '#a78bfa', '#f472b6', '#34d399'][Math.floor(Math.random() * 4)],
+      alpha: Math.random() * 0.7 + 0.3
+    }));
 
     // ─────────────────────────────────────────────────────────────────
-    // WEB AUDIO SYNTHESIZER (Cinematic Cyberpunk Soundtrack)
+    // WEB AUDIO SYNTHESIZER (Cinematic Cyber Beats & Sound FX)
     // ─────────────────────────────────────────────────────────────────
     function initAudio() {
       if (audioCtx) return;
@@ -568,11 +562,16 @@
 
     function playCinematicImpact() {
       if (!audioCtx || isMuted) return;
-      playSynthTone(75, 1.2, 'sawtooth', 0.25);
-      playSynthTone(150, 0.8, 'triangle', 0.2);
+      playSynthTone(65, 1.4, 'sawtooth', 0.28);
+      playSynthTone(130, 0.9, 'triangle', 0.22);
     }
 
-    // Background music loop generator
+    function playLaserDataBeep() {
+      if (!audioCtx || isMuted) return;
+      playSynthTone(880, 0.12, 'sine', 0.12);
+      setTimeout(() => playSynthTone(1174, 0.18, 'sine', 0.12), 100);
+    }
+
     const cyberChords = [220, 261.6, 329.6, 392, 440, 523.2];
     let noteStep = 0;
     function startMusicLoop() {
@@ -588,7 +587,6 @@
       }, 350);
     }
 
-    // Voice Narration
     function speakNarration(text) {
       if (isMuted || !('speechSynthesis' in window)) return;
       window.speechSynthesis.cancel();
@@ -602,21 +600,554 @@
     }
 
     // ─────────────────────────────────────────────────────────────────
-    // VIDEO RENDERING PIPELINE (Canvas 60fps)
+    // DETAILED VECTOR UI MOCKUPS (PC LAPTOP + ANDROID SMARTPHONE)
+    // ─────────────────────────────────────────────────────────────────
+
+    // 1. Draw Detailed Windows 11 Laptop Mockup
+    function drawLaptopMockup(x, y, w, h, sceneIndex, sceneProgress, time) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      // Chassis shadow
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+      ctx.shadowBlur = 40;
+      ctx.shadowOffsetY = 20;
+
+      // Laptop Display Outer Bezel
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(-w / 2, -h / 2, w, h, 14);
+      ctx.fill();
+      ctx.stroke();
+      ctx.shadowBlur = 0; // reset shadow
+
+      // Webcam top dot
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.arc(0, -h / 2 + 10, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Screen Inner Area
+      const pad = 18;
+      const sw = w - pad * 2;
+      const sh = h - pad * 2;
+      const sx = -w / 2 + pad;
+      const sy = -h / 2 + pad;
+
+      ctx.fillStyle = '#050811';
+      ctx.fillRect(sx, sy, sw, sh);
+
+      // ── Windows 11 App Window inside Laptop ──
+      // Top window header
+      ctx.fillStyle = '#0d1322';
+      ctx.fillRect(sx, sy, sw, 32);
+
+      // Window control dots (close, min, max)
+      const dotColors = ['#ef4444', '#f59e0b', '#10b981'];
+      for (let i = 0; i < 3; i++) {
+        ctx.fillStyle = dotColors[i];
+        ctx.beginPath();
+        ctx.arc(sx + 16 + i * 14, sy + 16, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // App Title in Header
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 12px Outfit';
+      ctx.textAlign = 'center';
+      ctx.fillText("Jenni AI — Personal Assistant (Windows 11)", sx + sw / 2, sy + 20);
+
+      // Sidebar in App Window
+      const sideW = sw * 0.24;
+      ctx.fillStyle = '#0a0f1d';
+      ctx.fillRect(sx, sy + 32, sideW, sh - 32);
+
+      // Brand in Sidebar
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.arc(sx + 24, sy + 56, 9, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '700 13px Outfit';
+      ctx.textAlign = 'left';
+      ctx.fillText("Jenni AI", sx + 40, sy + 60);
+
+      // Sidebar Tab items
+      const tabs = [
+        { name: "Chat & Voice", active: sceneIndex === 0 || sceneIndex === 2 },
+        { name: "PC Control", active: sceneIndex === 2 },
+        { name: "Image Studio", active: sceneIndex === 3 },
+        { name: "Personal Memory", active: sceneIndex === 4 },
+        { name: "Android Connect", active: sceneIndex === 1 }
+      ];
+
+      tabs.forEach((tab, i) => {
+        const tabY = sy + 90 + i * 32;
+        if (tab.active) {
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.16)';
+          ctx.fillRect(sx + 8, tabY - 14, sideW - 16, 26);
+          ctx.fillStyle = '#38bdf8';
+          ctx.fillRect(sx + 8, tabY - 14, 3, 26);
+        }
+        ctx.fillStyle = tab.active ? '#38bdf8' : '#64748b';
+        ctx.font = '600 11px Outfit';
+        ctx.fillText(tab.name, sx + 22, tabY + 4);
+      });
+
+      // ── Main Content Area in App Window ──
+      const mx = sx + sideW + 12;
+      const my = sy + 44;
+      const mw = sw - sideW - 24;
+
+      if (sceneIndex === 1) {
+        // SCENE 2: SHOW QR CODE ON LAPTOP SCREEN
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '700 16px Outfit';
+        ctx.textAlign = 'left';
+        ctx.fillText("Android 12 Phone Integration", mx, my + 14);
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '12px Outfit';
+        ctx.fillText("Point phone camera to pair over WireGuard mesh", mx, my + 34);
+
+        // QR Code Box
+        const qrSize = 140;
+        const qrx = mx + mw / 2 - qrSize / 2;
+        const qry = my + 55;
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.roundRect(qrx, qry, qrSize, qrSize, 8);
+        ctx.fill();
+
+        // Realistic QR pattern simulation
+        ctx.fillStyle = '#030712';
+        for (let row = 0; row < 7; row++) {
+          for (let col = 0; col < 7; col++) {
+            if ((row + col) % 2 === 0 || (row < 2 && col < 2) || (row > 4 && col < 2) || (row < 2 && col > 4)) {
+              ctx.fillRect(qrx + 12 + col * 17, qry + 12 + row * 17, 13, 13);
+            }
+          }
+        }
+
+        // Animated Scanning Laser Line
+        const laserY = qry + 10 + (Math.sin(time * 5) * 0.5 + 0.5) * (qrSize - 20);
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 3;
+        ctx.shadowColor = '#38bdf8';
+        ctx.shadowBlur = 14;
+        ctx.beginPath();
+        ctx.moveTo(qrx - 10, laserY);
+        ctx.lineTo(qrx + qrSize + 10, laserY);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+      } else if (sceneIndex === 2) {
+        // SCENE 3: SHOW HARDWARE METRICS & APP LAUNCHERS
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '700 16px Outfit';
+        ctx.textAlign = 'left';
+        ctx.fillText("Safe PC Functions & Hardware", mx, my + 14);
+
+        // 4 Hardware Metric Cards
+        const cardW = (mw - 18) / 2;
+        const cardH = 50;
+
+        const metrics = [
+          { title: "CPU Utilization", val: `${Math.round(28 + Math.sin(time * 3) * 12)}%`, col: '#38bdf8' },
+          { title: "System RAM (16GB)", val: "7.8 / 16 GB", col: '#a78bfa' },
+          { title: "GPU VRAM (RTX 3050)", val: "2480 MB Active", col: '#f472b6' },
+          { title: "C: Drive Storage", val: "382 GB Free", col: '#34d399' }
+        ];
+
+        metrics.forEach((m, idx) => {
+          const cx = mx + (idx % 2) * (cardW + 12);
+          const cy = my + 34 + Math.floor(idx / 2) * (cardH + 10);
+
+          ctx.fillStyle = '#111827';
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.roundRect(cx, cy, cardW, cardH, 8);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = '10px Outfit';
+          ctx.fillText(m.title, cx + 10, cy + 18);
+
+          ctx.fillStyle = m.col;
+          ctx.font = '700 15px Outfit';
+          ctx.fillText(m.val, cx + 10, cy + 40);
+        });
+
+        // App Launch Box (VS Code trigger acknowledged!)
+        const appBoxY = my + 160;
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.15)';
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(mx, appBoxY, mw, 52, 8);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#10b981';
+        ctx.font = '700 13px Outfit';
+        ctx.fillText("✓ Remote Command Executed: Launched VS Code on Windows 11", mx + 16, appBoxY + 30);
+
+      } else if (sceneIndex === 3) {
+        // SCENE 4: SHOW IMAGE STUDIO
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '700 16px Outfit';
+        ctx.textAlign = 'left';
+        ctx.fillText("Neural Image Studio — RTX 3050 Acceleration", mx, my + 14);
+
+        // Art preview box
+        const artW = mw * 0.65;
+        const artH = 150;
+        ctx.fillStyle = '#111827';
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(mx, my + 32, artW, artH, 10);
+        ctx.fill();
+        ctx.stroke();
+
+        // Futuristic art graphic simulation
+        const grad = ctx.createLinearGradient(mx, my + 32, mx + artW, my + 32 + artH);
+        grad.addColorStop(0, '#1e1b4b');
+        grad.addColorStop(0.5, '#0369a1');
+        grad.addColorStop(1, '#db2777');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.roundRect(mx + 6, my + 38, artW - 12, artH - 12, 8);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '700 15px Outfit';
+        ctx.fillText("Prompt: \"cyberpunk futuristic AI core\"", mx + 16, my + 80);
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = '600 12px "JetBrains Mono"';
+        ctx.fillText("Model: SD 1.5 / Flux • 512x512 • 4.2s", mx + 16, my + 106);
+
+      } else {
+        // DEFAULT SCENE (0, 5, 6): CHAT ASSISTANT
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '700 16px Outfit';
+        ctx.textAlign = 'left';
+        ctx.fillText("Chat & Voice Assistant", mx, my + 14);
+
+        // Chat bubbles
+        const b1y = my + 36;
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.roundRect(mx, b1y, mw * 0.75, 42, 10);
+        ctx.fill();
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = '700 11px Outfit';
+        ctx.fillText("Jenni AI", mx + 12, b1y + 16);
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = '12px Outfit';
+        ctx.fillText("Hello! I am Jenni AI, your private assistant for Windows 11.", mx + 12, b1y + 32);
+
+        const b2y = my + 90;
+        ctx.fillStyle = '#0284c7';
+        ctx.beginPath();
+        ctx.roundRect(mx + mw * 0.25, b2y, mw * 0.75, 36, 10);
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '12px Outfit';
+        ctx.fillText("Show me system status and launch VS Code", mx + mw * 0.25 + 14, b2y + 22);
+
+        const b3y = my + 138;
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.roundRect(mx, b3y, mw * 0.85, 46, 10);
+        ctx.fill();
+        ctx.fillStyle = '#10b981';
+        ctx.font = '700 11px Outfit';
+        ctx.fillText("✓ Action Executed", mx + 12, b3y + 16);
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = '12px Outfit';
+        ctx.fillText("VS Code launched. System CPU is at 28%, 7.8GB RAM used.", mx + 12, b3y + 34);
+      }
+
+      // Laptop Chassis Bottom Base & Keyboard Deck
+      const bw = w * 1.15;
+      const bh = 18;
+      const bx = -bw / 2;
+      const by = h / 2;
+
+      ctx.fillStyle = '#1e293b';
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(bx, by, bw, bh, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      // Trackpad notch
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(-50, by, 100, 5);
+
+      ctx.restore();
+    }
+
+    // 2. Draw Detailed Android 12 Smartphone Mockup
+    function drawPhoneMockup(x, y, w, h, sceneIndex, sceneProgress, time) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      // Phone shadow
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
+      ctx.shadowBlur = 35;
+      ctx.shadowOffsetY = 18;
+
+      // Outer phone shell
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.roundRect(-w / 2, -h / 2, w, h, 28);
+      ctx.fill();
+      ctx.stroke();
+      ctx.shadowBlur = 0; // reset
+
+      // Screen Inner display
+      const pw = w - 16;
+      const ph = h - 16;
+      const px = -w / 2 + 8;
+      const py = -h / 2 + 8;
+
+      ctx.fillStyle = '#050811';
+      ctx.beginPath();
+      ctx.roundRect(px, py, pw, ph, 22);
+      ctx.fill();
+
+      // Punch hole selfie camera
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(0, py + 12, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Android Status Bar
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 10px "JetBrains Mono"';
+      ctx.textAlign = 'left';
+      ctx.fillText("10:25", px + 14, py + 16);
+
+      ctx.textAlign = 'right';
+      ctx.fillText("5G  100%", px + pw - 14, py + 16);
+
+      // Phone App Header
+      ctx.fillStyle = '#0d1322';
+      ctx.fillRect(px, py + 26, pw, 36);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.arc(px + 20, py + 44, 7, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '700 12px Outfit';
+      ctx.textAlign = 'left';
+      ctx.fillText("Jenni Mobile", px + 34, py + 48);
+
+      // Tailscale IP Tag
+      ctx.fillStyle = '#10b981';
+      ctx.font = '600 9px "JetBrains Mono"';
+      ctx.textAlign = 'right';
+      ctx.fillText("100.74.215.8", px + pw - 12, py + 48);
+
+      // ── Phone Content Area ──
+      const pyContent = py + 74;
+
+      if (sceneIndex === 1) {
+        // SCENE 2: SCANNING CAMERA VIEW ON PHONE
+        ctx.fillStyle = '#111827';
+        ctx.fillRect(px + 10, pyContent, pw - 20, ph - 150);
+
+        // Viewfinder reticle
+        const retW = pw - 50;
+        const retH = pw - 50;
+        const retX = px + pw / 2 - retW / 2;
+        const retY = pyContent + 30;
+
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(retX, retY, retW, retH);
+
+        // Reticle laser sweep
+        const sweepY = retY + (Math.sin(time * 5) * 0.5 + 0.5) * retH;
+        ctx.strokeStyle = '#f43f5e';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(retX, sweepY);
+        ctx.lineTo(retX + retW, sweepY);
+        ctx.stroke();
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = '700 11px Outfit';
+        ctx.textAlign = 'center';
+        ctx.fillText("ALIGN QR CODE TO PAIR", px + pw / 2, retY + retH + 30);
+
+      } else if (sceneIndex === 3) {
+        // SCENE 4: PHONE SHOWS SYNCED ARTWORK
+        ctx.fillStyle = '#111827';
+        ctx.beginPath();
+        ctx.roundRect(px + 10, pyContent, pw - 20, 160, 12);
+        ctx.fill();
+
+        const grad = ctx.createLinearGradient(px + 10, pyContent, px + pw - 10, pyContent + 160);
+        grad.addColorStop(0, '#1e1b4b');
+        grad.addColorStop(0.5, '#0369a1');
+        grad.addColorStop(1, '#db2777');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.roundRect(px + 16, pyContent + 6, pw - 32, 148, 8);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '700 11px Outfit';
+        ctx.textAlign = 'center';
+        ctx.fillText("✓ Synced to Android Gallery", px + pw / 2, pyContent + 190);
+
+      } else {
+        // CHAT CONVERSATION ON PHONE
+        // User bubble
+        ctx.fillStyle = '#0284c7';
+        ctx.beginPath();
+        ctx.roundRect(px + pw * 0.25, pyContent, pw * 0.7, 34, 10);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '10px Outfit';
+        ctx.textAlign = 'left';
+        ctx.fillText("Open VS Code on PC", px + pw * 0.25 + 10, pyContent + 21);
+
+        // Jenni response bubble
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.roundRect(px + 10, pyContent + 44, pw * 0.78, 48, 10);
+        ctx.fill();
+
+        ctx.fillStyle = '#10b981';
+        ctx.font = '700 10px Outfit';
+        ctx.fillText("✓ PC Action Complete", px + 18, pyContent + 60);
+
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = '10px Outfit';
+        ctx.fillText("VS Code launched on PC via Tailscale mesh tunnel.", px + 18, pyContent + 78);
+      }
+
+      // Bottom Push-to-Talk Mic Bar on Phone
+      const barY = py + ph - 54;
+      ctx.fillStyle = '#0d1322';
+      ctx.fillRect(px, barY, pw, 54);
+
+      // Pulsing Mic Circle
+      const micPulse = 1 + Math.sin(time * 6) * 0.12;
+      ctx.fillStyle = '#38bdf8';
+      ctx.shadowColor = '#38bdf8';
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      ctx.arc(0, barY + 26, 16 * micPulse, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Mic Icon
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.roundRect(-4, barY + 18, 8, 12, 4);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // 3. Draw Dynamic Animated Connectivity Mesh Bridge
+    function drawConnectivityBridge(laptopX, laptopY, phoneX, phoneY, time, sceneIndex) {
+      ctx.save();
+
+      // Start from laptop Wi-Fi top-right corner to phone top-left corner
+      const startX = laptopX + 320;
+      const startY = laptopY - 140;
+      const endX = phoneX - 110;
+      const endY = phoneY - 140;
+
+      // Curved Bezier WireGuard Beam
+      const ctrlX = (startX + endX) / 2;
+      const ctrlY = startY - 100;
+
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([8, 6]);
+      ctx.lineDashOffset = -time * 30; // Flowing animation
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.quadraticCurveTo(ctrlX, ctrlY, endX, endY);
+      ctx.stroke();
+      ctx.setLineDash([]); // reset
+
+      // Animated Glowing Data Packets traveling along the curve
+      const packetCount = 4;
+      for (let i = 0; i < packetCount; i++) {
+        const u = ((time * 0.8 + (i / packetCount)) % 1.0);
+        // Quadratic bezier equation: B(u) = (1-u)^2 * P0 + 2(1-u)u * P1 + u^2 * P2
+        const px = Math.pow(1 - u, 2) * startX + 2 * (1 - u) * u * ctrlX + Math.pow(u, 2) * endX;
+        const py = Math.pow(1 - u, 2) * startY + 2 * (1 - u) * u * ctrlY + Math.pow(u, 2) * endY;
+
+        ctx.fillStyle = i % 2 === 0 ? '#38bdf8' : '#f472b6';
+        ctx.shadowColor = ctx.fillStyle;
+        ctx.shadowBlur = 16;
+        ctx.beginPath();
+        ctx.arc(px, py, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
+      // Center Mesh Security Shield Badge
+      const badgeX = ctrlX;
+      const badgeY = ctrlY + 10;
+
+      ctx.fillStyle = 'rgba(11, 15, 25, 0.9)';
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(badgeX - 140, badgeY - 26, 280, 52, 26);
+      ctx.fill();
+      ctx.stroke();
+
+      // WireGuard Shield Icon & Label
+      ctx.fillStyle = '#10b981';
+      ctx.font = '700 13px Outfit';
+      ctx.textAlign = 'center';
+      ctx.fillText("🔒 WireGuard Mesh Tunnel", badgeX, badgeY - 5);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 10px "JetBrains Mono"';
+      ctx.fillText("100.102.38.116 ↔ 100.74.215.8 (2ms)", badgeX, badgeY + 14);
+
+      ctx.restore();
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // MAIN FRAME RENDER LOOP (Canvas 60fps)
     // ─────────────────────────────────────────────────────────────────
     function renderFrame(time) {
-      // Clear background
+      // 1. Clear background
       ctx.fillStyle = '#030712';
       ctx.fillRect(0, 0, W, H);
 
-      // 1. Draw 3D Perspective Digital Floor Grid
+      // 2. Draw 3D Perspective Grid Floor
       ctx.save();
       ctx.strokeStyle = 'rgba(56, 189, 248, 0.12)';
       ctx.lineWidth = 1.5;
-      const horizonY = H * 0.65;
+      const horizonY = H * 0.70;
       const vanishingX = W / 2;
 
-      for (let x = -W; x <= W * 2; x += 120) {
+      for (let x = -W; x <= W * 2; x += 110) {
         ctx.beginPath();
         ctx.moveTo(vanishingX, horizonY);
         ctx.lineTo(x, H);
@@ -630,7 +1161,7 @@
       }
       ctx.restore();
 
-      // 2. Draw Floating Particles
+      // 3. Draw Ambient Floating Particles
       particles.forEach(p => {
         p.x += p.vx;
         p.y += p.vy;
@@ -647,125 +1178,62 @@
       });
       ctx.globalAlpha = 1.0;
 
-      // Determine current scene
+      // 4. Current Scene calculation
       const sceneIndex = SCENES.findIndex(s => time >= s.start && time < s.end);
       const activeIndex = sceneIndex !== -1 ? sceneIndex : SCENES.length - 1;
       const currentScene = SCENES[activeIndex];
 
-      // Voice trigger on scene change
+      // Voice Trigger on Scene Change
       if (activeIndex !== lastSpokenScene && isPlaying) {
         lastSpokenScene = activeIndex;
         playCinematicImpact();
+        if (activeIndex === 1 || activeIndex === 2) playLaserDataBeep();
         speakNarration(currentScene.speech);
         updateSceneSelectorUI(activeIndex);
       }
 
       const sceneProgress = (time - currentScene.start) / (currentScene.end - currentScene.start);
 
-      // 3. Draw Scene Visual Elements
-      renderSceneGraphics(activeIndex, sceneProgress, time);
+      // 5. Draw Dual-Device UI Mockups & Mesh Connectivity
+      const laptopX = W * 0.36;
+      const laptopY = H * 0.44;
+      const laptopW = 760;
+      const laptopH = 460;
 
-      // 4. Draw Cinematic HUD Overlays (Letterbox & Title)
+      const phoneX = W * 0.80;
+      const phoneY = H * 0.45;
+      const phoneW = 240;
+      const phoneH = 470;
+
+      // Draw Laptop UI
+      drawLaptopMockup(laptopX, laptopY, laptopW, laptopH, activeIndex, sceneProgress, time);
+
+      // Draw Smartphone UI
+      drawPhoneMockup(phoneX, phoneY, phoneW, phoneH, activeIndex, sceneProgress, time);
+
+      // Draw Connectivity Mesh Bridge
+      drawConnectivityBridge(laptopX, laptopY, phoneX, phoneY, time, activeIndex);
+
+      // 6. Draw HUD Banner & Animated Titles
       renderHUD(currentScene, sceneProgress, time);
     }
 
-    // Scene Specific Visual Graphics
-    function renderSceneGraphics(index, progress, time) {
-      const centerX = W / 2;
-      const centerY = H / 2 - 40;
-
-      // Rotating glowing AI Core
-      ctx.save();
-      ctx.translate(centerX, centerY);
-
-      const pulse = 1 + Math.sin(time * 4) * 0.06;
-      const coreGrad = ctx.createRadialGradient(0, 0, 10, 0, 0, 200 * pulse);
-      coreGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
-      coreGrad.addColorStop(0.25, 'rgba(56, 189, 248, 0.8)');
-      coreGrad.addColorStop(0.6, 'rgba(167, 139, 250, 0.4)');
-      coreGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-      ctx.fillStyle = coreGrad;
-      ctx.beginPath();
-      ctx.arc(0, 0, 200 * pulse, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Orbiting Neon Rings
-      for (let r = 0; r < 3; r++) {
-        ctx.save();
-        ctx.rotate((time * (r % 2 === 0 ? 1 : -1) * 0.7) + (r * 1.2));
-        ctx.strokeStyle = r === 0 ? '#38bdf8' : r === 1 ? '#a78bfa' : '#f472b6';
-        ctx.lineWidth = 3;
-        ctx.globalAlpha = 0.65;
-        ctx.beginPath();
-        ctx.ellipse(0, 0, 220 + r * 50, 90 + r * 30, (r * Math.PI) / 4, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.restore();
-      }
-      ctx.restore();
-
-      // Scene-specific holographic floating cards
-      if (index === 0) {
-        drawHoloCard(centerX, centerY + 180, "JARVIS-INSPIRED ARCHITECTURE", "Offline Local AI • Windows 11 & Android 12", "#38bdf8");
-      } else if (index === 1) {
-        drawHoloCard(centerX, centerY + 180, "ZERO CLOUD TELEMETRY", "Qwen 2.5 3B • 100% On-Device Ollama Engine", "#34d399");
-      } else if (index === 2) {
-        drawHoloCard(centerX - 260, centerY + 160, "HARDWARE SENSORS", "CPU 12% • RAM 7.8GB • C: 380GB", "#38bdf8");
-        drawHoloCard(centerX + 260, centerY + 160, "SAFE APP LAUNCH", "VS Code • Notepad • Calc • Explorer", "#a78bfa");
-      } else if (index === 3) {
-        drawHoloCard(centerX, centerY + 180, "RTX 3050 4GB OPTIMIZED", "ComfyUI Local • SD 1.5 • Fast Synthesis", "#f472b6");
-      } else if (index === 4) {
-        drawHoloCard(centerX, centerY + 180, "WIREGUARD MESH", "Encrypted Tailscale Tunnel • Tasker Automation", "#34d399");
-      } else if (index === 5) {
-        drawHoloCard(centerX, centerY + 180, "READY TO DEPLOY", "git clone https://github.com/jsssameer7/jenni_ai", "#38bdf8");
-      }
-    }
-
-    function drawHoloCard(x, y, header, sub, accentColor) {
-      ctx.save();
-      ctx.translate(x, y);
-
-      // Glass background
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
-      ctx.strokeStyle = accentColor;
-      ctx.lineWidth = 1.5;
-
-      const cardW = 460;
-      const cardH = 90;
-      ctx.beginPath();
-      ctx.roundRect(-cardW / 2, -cardH / 2, cardW, cardH, 14);
-      ctx.fill();
-      ctx.stroke();
-
-      // Header text
-      ctx.fillStyle = accentColor;
-      ctx.font = '700 22px Outfit';
-      ctx.textAlign = 'center';
-      ctx.fillText(header, 0, -8);
-
-      // Sub text
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '500 16px Outfit';
-      ctx.fillText(sub, 0, 22);
-
-      ctx.restore();
-    }
-
     function renderHUD(scene, progress, time) {
-      // Top bar badge
       ctx.save();
-      ctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+
+      // Top brand badge
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.14)';
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.roundRect(80, 80, 260, 42, 21);
+      ctx.roundRect(80, 50, 280, 42, 21);
       ctx.fill();
       ctx.stroke();
 
       ctx.fillStyle = '#38bdf8';
-      ctx.font = '700 15px "JetBrains Mono"';
+      ctx.font = '700 14px "JetBrains Mono"';
       ctx.textAlign = 'center';
-      ctx.fillText("JENNI AI // v1.0.0", 210, 107);
+      ctx.fillText("JENNI AI // PC & MOBILE MESH", 220, 76);
 
       // Top right timecode
       ctx.fillStyle = '#94a3b8';
@@ -773,36 +1241,36 @@
       ctx.textAlign = 'right';
       const secStr = Math.floor(time).toString().padStart(2, '0');
       const msStr = Math.floor((time % 1) * 100).toString().padStart(2, '0');
-      ctx.fillText(`00:${secStr}:${msStr} / 00:${TOTAL_DURATION}:00`, W - 80, 108);
+      ctx.fillText(`00:${secStr}:${msStr} / 00:${TOTAL_DURATION}:00`, W - 80, 78);
 
-      // Center Big Animated Title
+      // Bottom Big Kinetic Typography
       ctx.textAlign = 'center';
       ctx.fillStyle = '#ffffff';
-      ctx.font = '900 68px Outfit';
+      ctx.font = '900 62px Outfit';
       ctx.shadowColor = 'rgba(56, 189, 248, 0.65)';
-      ctx.shadowBlur = 30;
-      ctx.fillText(scene.title, W / 2, H - 210);
+      ctx.shadowBlur = 28;
+      ctx.fillText(scene.title, W / 2, H - 150);
 
       // Subtitle
       ctx.shadowBlur = 0;
       ctx.fillStyle = '#38bdf8';
-      ctx.font = '600 28px Outfit';
-      ctx.fillText(scene.subtitle, W / 2, H - 150);
+      ctx.font = '600 24px Outfit';
+      ctx.fillText(scene.subtitle, W / 2, H - 98);
 
-      // Sound Waveform Bars Indicator (Bottom)
-      const barCount = 48;
+      // Bottom Sound Waveform Visualizer
+      const barCount = 52;
       const barWidth = 6;
       const barSpacing = 8;
       const totalBarW = barCount * (barWidth + barSpacing);
       const startX = (W - totalBarW) / 2;
 
       for (let i = 0; i < barCount; i++) {
-        const height = isPlaying ? Math.abs(Math.sin(time * 8 + i * 0.35)) * 34 + 6 : 4;
-        const grad = ctx.createLinearGradient(0, H - 90, 0, H - 90 - height);
+        const height = isPlaying ? Math.abs(Math.sin(time * 8 + i * 0.35)) * 28 + 4 : 4;
+        const grad = ctx.createLinearGradient(0, H - 45, 0, H - 45 - height);
         grad.addColorStop(0, '#38bdf8');
         grad.addColorStop(1, '#a78bfa');
         ctx.fillStyle = grad;
-        ctx.fillRect(startX + i * (barWidth + barSpacing), H - 85 - height, barWidth, height);
+        ctx.fillRect(startX + i * (barWidth + barSpacing), H - 40 - height, barWidth, height);
       }
 
       ctx.restore();
@@ -890,17 +1358,15 @@
     }
 
     // ─────────────────────────────────────────────────────────────────
-    // VIDEO EXPORT / DOWNLOAD (.webm / .mp4 MediaRecorder)
+    // VIDEO EXPORT / DOWNLOAD (.webm MediaRecorder)
     // ─────────────────────────────────────────────────────────────────
     function startRecordingVideo() {
       initAudio();
       recordedChunks = [];
       isExporting = true;
 
-      // 60FPS Canvas Stream
       const canvasStream = canvas.captureStream(60);
 
-      // Combine audio if available
       let combinedStream = canvasStream;
       if (audioDestination && audioDestination.stream.getAudioTracks().length > 0) {
         const audioTrack = audioDestination.stream.getAudioTracks()[0];
@@ -927,7 +1393,7 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `Jenni_AI_Official_Promo_Video.webm`;
+        a.download = `Jenni_AI_PC_Mobile_Commercial.webm`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -937,14 +1403,13 @@
         const btn = document.getElementById('export-video-btn');
         btn.classList.remove('recording');
         document.getElementById('rec-btn-text').textContent = 'Download Video';
-        alert('🎉 Promo video generated and downloaded successfully!');
+        alert('🎉 Commercial video generated and downloaded successfully!');
       };
 
       const btn = document.getElementById('export-video-btn');
       btn.classList.add('recording');
       document.getElementById('rec-btn-text').textContent = 'Recording Video...';
 
-      // Reset to beginning and play full video
       currentTime = 0;
       lastSpokenScene = -1;
       mediaRecorder.start();
@@ -970,7 +1435,6 @@
       if (isMuted && 'speechSynthesis' in window) window.speechSynthesis.cancel();
     });
 
-    // Timeline Scrubbing
     const timelineBar = document.getElementById('timeline-bar');
     timelineBar.addEventListener('click', e => {
       const rect = timelineBar.getBoundingClientRect();
@@ -987,7 +1451,6 @@
       }
     });
 
-    // Spacebar to play/pause
     document.addEventListener('keydown', e => {
       if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
         e.preventDefault();
@@ -995,7 +1458,6 @@
       }
     });
 
-    // Initial render
     renderFrame(0);
     requestAnimationFrame(tick);
   </script>
