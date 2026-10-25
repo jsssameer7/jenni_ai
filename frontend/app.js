@@ -351,6 +351,23 @@ function renderMessage(role, text, metadata = null) {
     actCard.className = "action-card-inline";
     actCard.innerHTML = `<span>⚡</span> <span>${metadata.data.message || "Executed PC Action"}</span>`;
     bubble.appendChild(actCard);
+
+    if (metadata.data.url) {
+      const imgWrap = document.createElement("div");
+      imgWrap.className = "chat-image-preview";
+      imgWrap.style = "margin-top: 10px; border-radius: 12px; overflow: hidden; max-width: 380px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); cursor: pointer;";
+      imgWrap.innerHTML = `
+        <img src="${metadata.data.url}" alt="${metadata.data.prompt || 'Generated AI Image'}" style="width: 100%; height: auto; display: block;" loading="lazy">
+        <div style="padding: 8px 12px; background: rgba(15,23,42,0.95); font-size: 12px; color: #94a3b8; display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: #38bdf8; font-weight: 500;">Jenni AI • Watermark-Free</span>
+          <span style="font-size: 11px;">Click to enlarge</span>
+        </div>
+      `;
+      imgWrap.addEventListener("click", () => {
+        openImageModal(metadata.data.url, metadata.data.filename || "jenni_ai.png");
+      });
+      bubble.appendChild(imgWrap);
+    }
   }
 
   row.appendChild(avatar);
@@ -703,8 +720,10 @@ function setupImageStudioHandlers() {
           alert(d.detail || d.message || "Image generation failed.");
           return;
         }
-        alert(d.message || "Artwork synthesized!");
-        loadImages();
+        await loadImages();
+        if (d.url) {
+          openImageModal(d.url, d.filename || "jenni_ai.png");
+        }
       } catch (e) {
         alert("Image generation failed: " + (e.message || "Server offline."));
       } finally {

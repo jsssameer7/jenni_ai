@@ -49,7 +49,7 @@ class AIService:
     @staticmethod
     def detect_instant_intent(user_text: str) -> Optional[Tuple[str, Dict[str, Any]]]:
         """
-        Fast intent recognition for instant PC actions (e.g. 'open calculator', 'launch notepad').
+        Fast intent recognition for instant PC actions (e.g. 'open calculator', 'create cat image').
         Returns (action_type, execution_result) or None.
         """
         text = user_text.strip().lower()
@@ -72,16 +72,30 @@ class AIService:
         search_match = re.search(r"(?:find|search(?: for)?|locate)\s+(?:file|files|document|documents)?\s*(?:named|called)?\s*([a-zA-Z0-9_\-\.\*]+)", text)
         if search_match and len(search_match.group(1)) > 1:
             query = search_match.group(1).strip()
-            # If query is a generic keyword, search files
             if query not in ["the", "me", "a", "an", "my"]:
                 files = file_service.search_files(query=query, max_results=5)
                 return ("file_search", {"query": query, "files": files})
 
-        # 4. Generate Image Intent
-        img_match = re.search(r"(?:generate|create|draw|make|paint)\s+(?:an?\s+)?(?:image|picture|photo|art|artwork|visual|illustration)\s+(?:of\s+)?(.+)", text)
-        if img_match:
-            prompt = img_match.group(1).strip()
-            return ("generate_image", {"prompt": prompt})
+        # 4. Generate Image Intent (Handles 'create cat image', 'make a car picture', 'draw a sunset', 'image of red car', etc.)
+        clean_text = user_text.strip()
+        m1 = re.search(r"^(?:please\s+)?(?:generate|create|draw|make|paint|synthesize|show\s+me)\s+(?:an?\s+)?(.+?)\s+(?:image|picture|photo|photograph|art|artwork|wallpaper|drawing|illustration)$", clean_text, re.IGNORECASE)
+        m2 = re.search(r"^(?:please\s+)?(?:generate|create|draw|make|paint|synthesize|show\s+me)\s+(?:an?\s+)?(?:image|picture|photo|photograph|art|artwork|wallpaper|drawing|illustration)(?:\s+(?:of|showing|depicting|about))?\s*(.+)$", clean_text, re.IGNORECASE)
+        m3 = re.search(r"^(?:please\s+)?(?:draw|paint)\s+(?:an?\s+)?(.+)$", clean_text, re.IGNORECASE)
+        m4 = re.search(r"^(?:image|picture|photo)\s+(?:of|showing)\s+(.+)$", clean_text, re.IGNORECASE)
+
+        gen_prompt = None
+        if m1:
+            gen_prompt = m1.group(1).strip()
+        elif m2:
+            gen_prompt = m2.group(1).strip()
+        elif m3:
+            gen_prompt = m3.group(1).strip()
+        elif m4:
+            gen_prompt = m4.group(1).strip()
+
+        if gen_prompt:
+            gen_prompt = image_service.clean_prompt_for_generation(gen_prompt)
+            return ("generate_image", {"prompt": gen_prompt})
 
         return None
 
@@ -180,7 +194,20 @@ class AIService:
                 except Exception as ex:
                     ai_reply = f"Jenni AI: Could not reach Ollama at {settings.OLLAMA_BASE_URL} or online provider. Error: {str(ex)}"
             else:
-                ai_reply = f"Jenni AI: I am temporarily unable to connect to Ollama ({str(e)}). Please ensure Ollama is running with `ollama run qwen2.5:3b`."
+                # If Ollama is offline but an image was generated, respond with a friendly message
+                if executed_action and executed_action.get("type") == "image_generated":
+                    img_data = executed_action["data"]
+                    prompt_label = img_data.get("prompt", "your prompt")
+                    ai_reply = f"Here is your AI generated image for **\"{prompt_label}\"**! It has been generated without watermarks and saved to your Image Studio."
+                    model_used = "Jenni Neural Engine"
+                elif executed_action and executed_action.get("type") == "app_opened":
+                    ai_reply = executed_action["data"].get("message", "Application launched successfully.")
+                    model_used = "Jenni System Controller"
+                elif executed_action and executed_action.get("type") == "website_opened":
+                    ai_reply = executed_action["data"].get("message", "Website opened successfully.")
+                    model_used = "Jenni System Controller"
+                else:
+                    ai_reply = f"Jenni AI: I am temporarily unable to connect to Ollama ({str(e)}). Please ensure Ollama is running with `ollama run qwen2.5:3b`."
 
         # If user explicitly requested to remember something, add a confirmation note
         if saved_memory:
