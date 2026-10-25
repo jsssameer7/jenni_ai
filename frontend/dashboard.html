@@ -22,7 +22,7 @@
             window.location.replace('/login');
           }
         })
-        .catch(() => {}); // offline / server down — let page load
+        .catch(() => {});
     })();
   </script>
 </head>
@@ -384,7 +384,7 @@
           <div class="mobile-grid">
             <div class="mobile-card">
               <h4>Direct Phone Connection</h4>
-              <p>Scan or open this authenticated link on your Android phone's Chrome or Edge browser:</p>
+              <p>Scan or open this login link on your Android phone's Chrome or Edge browser:</p>
               
               <div class="tailscale-status-banner">
                 <div class="node-badge">
@@ -398,16 +398,16 @@
               </div>
 
               <div class="qr-container">
-                <img id="mobile-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=http://100.102.38.116:8000?token=jenni-mobile-token-2026&bgcolor=0f-17-2a&color=38-bdf8" alt="Scan to connect phone">
-                <div class="qr-hint">Point your Android 12 camera here to connect instantly!</div>
+                <img id="mobile-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=http://100.102.38.116:8000/login&bgcolor=0f-17-2a&color=38-bdf8" alt="Scan to connect phone">
+                <div class="qr-hint">Point your Android 12 camera here to log in on phone!</div>
               </div>
 
               <div class="url-box" id="mobile-connect-urls">
-                <div>🔗 <a id="direct-tailscale-link" href="http://100.102.38.116:8000?token=jenni-mobile-token-2026" target="_blank" style="color: #38bdf8;">http://100.102.38.116:8000?token=jenni-mobile-token-2026</a></div>
+                <div>🔗 <a id="direct-tailscale-link" href="http://100.102.38.116:8000/login" target="_blank" style="color: #38bdf8;">http://100.102.38.116:8000/login</a></div>
               </div>
               
               <button class="btn primary" id="copy-phone-url-btn" onclick="copyPhoneUrl()" style="width: 100%; justify-content: center; margin-bottom: 14px;">
-                📋 Copy Phone Connection Link
+                📋 Copy Phone Login Link
               </button>
 
               <div class="tip-box">
@@ -434,7 +434,7 @@ Method: POST
 URL: http://100.102.38.116:8000/api/chat
 Headers:
   Content-Type: application/json
-  X-Jenni-Token: jenni-mobile-token-2026
+  Authorization: Bearer &lt;YOUR_SESSION_TOKEN&gt;
 Body:
   {"message": "%VOICE_INPUT"}
               </pre>
@@ -476,30 +476,5 @@ Body:
   </div>
 
   <script src="/static/app.js"></script>
-  <script>
-    // ── Auth: show username in logout button ──
-    (function () {
-      try {
-        const u = JSON.parse(localStorage.getItem('jenni_user') || '{}');
-        const label = document.getElementById('logout-user-label');
-        if (label && u.display_name) label.textContent = u.display_name;
-      } catch (e) {}
-    })();
-
-    async function handleLogout() {
-      const token = localStorage.getItem('jenni_session_token');
-      if (token) {
-        try {
-          await fetch('/api/auth/logout', {
-            method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + token }
-          });
-        } catch (e) {}
-      }
-      localStorage.removeItem('jenni_session_token');
-      localStorage.removeItem('jenni_user');
-      window.location.replace('/login');
-    }
-  </script>
 </body>
 </html>

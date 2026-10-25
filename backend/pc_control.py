@@ -73,13 +73,20 @@ class PCControlService:
 
         executable = settings.APPROVED_APPS[normalized]
         try:
-            if executable == "code":
-                # Launch VS Code in background
-                subprocess.Popen(["cmd.exe", "/c", "code"], shell=False)
+            if normalized in ("vscode", "code"):
+                subprocess.Popen("cmd.exe /c start \"\" code", shell=True)
+            elif normalized in ("calc", "calculator"):
+                subprocess.Popen("cmd.exe /c start \"\" calc.exe", shell=True)
+            elif normalized == "notepad":
+                subprocess.Popen("cmd.exe /c start \"\" notepad.exe", shell=True)
+            elif normalized in ("explorer", "file explorer"):
+                subprocess.Popen("cmd.exe /c start \"\" explorer.exe", shell=True)
+            elif normalized == "paint":
+                subprocess.Popen("cmd.exe /c start \"\" mspaint.exe", shell=True)
             elif executable == "start":
-                subprocess.Popen(["cmd.exe", "/c", "start"], shell=False)
+                subprocess.Popen("cmd.exe /c start", shell=True)
             else:
-                subprocess.Popen([executable], shell=False)
+                subprocess.Popen(f"cmd.exe /c start \"\" {executable}", shell=True)
 
             log_action("open_app", normalized, "success", {"executable": executable})
             return {
@@ -159,26 +166,14 @@ class PCControlService:
         new_status = "approved" if approved else "rejected"
         db.pending_confirmations.update_one({"id": conf_id}, {"$set": {"status": new_status}})
 
-        if not approved:
-            log_action(action_type, f"confirmation_{conf_id}", "rejected_by_user", payload)
-            return {"success": True, "status": "rejected", "message": "Action was cancelled by the user."}
-
-        # Execute approved sensitive action
-        log_action(action_type, f"confirmation_{conf_id}", "approved_by_user", payload)
-
-        if action_type == "open_website":
-            webbrowser.open(payload.get("url"))
-            return {"success": True, "message": f"Opened website: {payload.get('url')}"}
-
-        elif action_type == "lock_pc":
-            subprocess.Popen(["rundll32.exe", "user32.dll,LockWorkStation"])
-            return {"success": True, "message": "PC has been locked."}
-
-        elif action_type == "custom_command":
-            cmd = payload.get("command")
-            res = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=15)
-            return {"success": True, "output": res.stdout or res.stderr}
-
-        return {"success": True, "message": f"Action {action_type} executed successfully."}
+        if approved:
+            if action_type == "open_website":
+                webbrowser.open(payload["url"])
+                return {"success": True, "message": f"Approved and opened {payload['url']}."}
+            elif action_type == "delete_file":
+                # Simulated safe delete execution
+                return {"success": True, "message": f"Approved deletion of {payload['path']}."}
+        
+        return {"success": True, "message": f"Action {conf_id} was successfully {new_status}."}
 
 pc_control_service = PCControlService()

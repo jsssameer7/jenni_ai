@@ -23,11 +23,9 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     
     # Security & Auth
-    # A persistent or configurable secret key for token verification
     SECRET_KEY: str = "jenni_ai_secret_key_change_me_in_production"
-    # Token required by remote clients (e.g. Android phone over Tailscale)
     AUTH_TOKEN: str = "jenni-mobile-token-2026"
-    REQUIRE_AUTH_FOR_LOCAL: bool = False  # Localhost is trusted by default
+    REQUIRE_AUTH_FOR_LOCAL: bool = True   # Both desktop and phone must log in
     REQUIRE_AUTH_FOR_REMOTE: bool = True  # Remote LAN/Tailscale must authenticate
     
     # Database — SQLite (legacy / fallback)

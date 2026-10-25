@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 from typing import Dict, Any, Optional
-from fastapi import FastAPI, Depends, HTTPException, Query, BackgroundTasks, status
+from fastapi import FastAPI, Depends, HTTPException, Query, BackgroundTasks, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
@@ -168,10 +168,13 @@ async def api_list_users(request: Request):
         raise HTTPException(status_code=403, detail="Admin access required.")
     return list_users()
 
-def _extract_bearer(request: Request) -> str | None:
+def _extract_bearer(request: Request) -> Optional[str]:
     auth = request.headers.get("Authorization", "")
     if auth.startswith("Bearer "):
-        return auth[7:]
+        return auth[7:].strip()
+    x_token = request.headers.get("X-Jenni-Token", "")
+    if x_token:
+        return x_token.strip()
     return None
 
 # --- Endpoints ---
@@ -335,15 +338,16 @@ async def cancel_task(req: TaskCancelRequest):
 @app.get("/api/mobile/info", dependencies=[Depends(verify_auth)])
 async def get_mobile_integration_info():
     ips = get_lan_and_tailscale_ips()
-    urls = [f"http://{item['ip']}:{item['port']}?token={settings.AUTH_TOKEN}" for item in ips]
+    urls = [f"http://{item['ip']}:{item['port']}/login" for item in ips]
     return {
         "title": "Jenni AI Android Integration Guide",
         "tailscale_steps": [
             "1. Install Tailscale on your Windows PC and Android 12 phone from Google Play Store.",
             "2. Sign in with the same Tailscale account on both devices.",
             "3. Note your PC's Tailscale 100.x.y.z IP address.",
-            "4. Open Chrome on Android and visit: http://<PC_TAILSCALE_IP>:8000?token=" + settings.AUTH_TOKEN,
-            "5. Tap 'Add to Home screen' in Chrome to install Jenni AI as a PWA / fullscreen app!"
+            "4. Open Chrome on Android and visit: http://<PC_TAILSCALE_IP>:8000/login",
+            "5. Log in with your account credentials.",
+            "6. Tap 'Add to Home screen' in Chrome to install Jenni AI as a PWA / fullscreen app!"
         ],
         "tasker_integration": {
             "description": "Send voice or trigger commands directly from Tasker to your Jenni AI server.",

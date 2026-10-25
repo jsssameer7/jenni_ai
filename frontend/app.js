@@ -5,19 +5,92 @@ let isSpeakingEnabled = false;
 let activeConfirmationId = null;
 let isRecording = false;
 let speechRecognition = null;
-let authToken = "";
+
+// --- Authentication & Session Management ---
+function getSessionToken() {
+  const params = new URLSearchParams(window.location.search);
+  const urlToken = params.get("token");
+  if (urlToken) {
+    localStorage.setItem("jenni_session_token", urlToken);
+    return urlToken;
+  }
+  return localStorage.getItem("jenni_session_token") || localStorage.getItem("jenni_token") || "";
+}
+
+function getCurrentUser() {
+  try {
+    const raw = localStorage.getItem("jenni_user");
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function handleLogout() {
+  const token = getSessionToken();
+  if (token) {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+    } catch (e) {}
+  }
+  localStorage.removeItem("jenni_session_token");
+  localStorage.removeItem("jenni_user");
+  localStorage.removeItem("jenni_token");
+  window.location.replace("/login");
+}
+
+function updateUserInfoUI() {
+  const user = getCurrentUser();
+  const label = document.getElementById("logout-user-label");
+  if (label && user) {
+    label.textContent = user.display_name || user.username || "";
+  }
+}
+
+function copyPhoneUrl() {
+  const host = window.location.host;
+  const protocol = window.location.protocol;
+  const url = `${protocol}//${host}/login`;
+  navigator.clipboard.writeText(url).then(() => {
+    alert("Phone login link copied to clipboard:\n" + url);
+  }).catch(() => {
+    prompt("Copy this URL to open on your Android phone:", url);
+  });
+}
+
+// Helper for authenticated fetch
+async function apiFetch(url, options = {}) {
+  const headers = Object.assign({}, options.headers || {});
+  const token = getSessionToken();
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+    headers["X-Jenni-Token"] = token;
+  }
+  try {
+    const res = await fetch(url, { ...options, headers });
+    if (res.status === 401) {
+      localStorage.removeItem("jenni_session_token");
+      window.location.replace("/login");
+    }
+    return res;
+  } catch (e) {
+    console.error("Network or fetch error:", e);
+    throw e;
+  }
+}
 
 // Initialize application
 document.addEventListener("DOMContentLoaded", async () => {
-  // Read token from URL query string if accessing remotely (e.g. Android phone)
-  const params = new URLSearchParams(window.location.search);
-  if (params.has("token")) {
-    authToken = params.get("token");
-    localStorage.setItem("jenni_token", authToken);
-  } else {
-    authToken = localStorage.getItem("jenni_token") || "";
+  const token = getSessionToken();
+  if (!token) {
+    window.location.replace("/login");
+    return;
   }
 
+  updateUserInfoUI();
   setupNavigation();
   setupSpeechRecognition();
   setupVoiceSynthesis();
@@ -39,25 +112,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Background metric poller every 5 seconds
   setInterval(loadPCMetrics, 5000);
 });
-
-function copyPhoneUrl() {
-  const url = "http://100.102.38.116:8000?token=jenni-mobile-token-2026";
-  navigator.clipboard.writeText(url).then(() => {
-    alert("Connection link copied to clipboard:\n" + url);
-  }).catch(() => {
-    prompt("Copy this URL to open on your Android phone:", url);
-  });
-}
-
-// Helper for authenticated fetch
-async function apiFetch(url, options = {}) {
-  const headers = options.headers || {};
-  if (authToken) {
-    headers["X-Jenni-Token"] = authToken;
-    headers["Authorization"] = `Bearer ${authToken}`;
-  }
-  return fetch(url, { ...options, headers });
-}
 
 // --- Navigation Tabs ---
 function setupNavigation() {
@@ -169,9 +223,8 @@ function setupVoiceSynthesis() {
   const iconOn = document.getElementById("tts-icon-on");
   const iconOff = document.getElementById("tts-icon-off");
 
-  // Load user saved preference, default to disabled (false)
   const savedPref = localStorage.getItem("jenni_audio_output");
-  isSpeakingEnabled = savedPref === "true"; // False unless user explicitly turned it on
+  isSpeakingEnabled = savedPref === "true";
 
   function updateTTSUI() {
     if (isSpeakingEnabled) {
@@ -211,9 +264,8 @@ function speakTextAloud(text) {
     const langSelect = document.getElementById("voice-lang-select");
     utterance.lang = langSelect ? langSelect.value : "en-US";
     utterance.rate = 1.0;
-    utterance.pitch = 1.05; // Slightly pleasant assistant pitch
+    utterance.pitch = 1.05;
 
-    // Choose preferred voice if available
     const voices = window.speechSynthesis.getVoices();
     const preferredVoice = voices.find(v => 
       v.name.includes("Zira") || v.name.includes("Female") || v.name.includes("Google UK English Female")
@@ -285,7 +337,6 @@ function renderMessage(role, text, metadata = null) {
   const bubble = document.createElement("div");
   bubble.className = "msg-bubble";
 
-  // Format basic markdown (code blocks, bold, line breaks)
   let formatted = text
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
@@ -295,7 +346,6 @@ function renderMessage(role, text, metadata = null) {
 
   bubble.innerHTML = formatted;
 
-  // Render executed action card if present
   if (metadata && metadata.data) {
     const actCard = document.createElement("div");
     actCard.className = "action-card-inline";
@@ -313,7 +363,6 @@ function renderMessage(role, text, metadata = null) {
 async function sendMessage(text) {
   renderMessage("user", text);
 
-  // Temporary typing indicator
   const container = document.getElementById("chat-messages");
   const typingRow = document.createElement("div");
   typingRow.className = "message-row assistant typing-temp";
@@ -337,23 +386,20 @@ async function sendMessage(text) {
       const data = await res.json();
       renderMessage("assistant", data.content, data.action);
 
-      // Speak answer aloud only if explicitly enabled
       if (isSpeakingEnabled && data.spoken_text) {
         speakTextAloud(data.spoken_text);
       }
 
-      // Check if action needed confirmation
       if (data.action && data.action.data && data.action.data.needs_confirmation) {
         showConfirmationModal(data.action.data.confirmation_id, data.action.data.message);
       }
 
-      // Reload memories if a new one was saved
       if (data.memory_saved) {
         loadMemories();
       }
     } else {
       const err = await res.json();
-      renderMessage("assistant", `⚠️ Error: ${err.detail || "Unable to get response from Jenni AI"}`);
+      renderMessage("assistant", `⚠️ Error: ${err.detail || err.message || "Unable to get response from Jenni AI"}`);
     }
   } catch (e) {
     typingRow.remove();
@@ -411,7 +457,7 @@ async function loadSystemStatus() {
 async function loadPCMetrics() {
   try {
     const res = await apiFetch("/api/pc/status");
-    if (res.ok) {
+    if (res && res.ok) {
       const d = await res.json();
 
       document.getElementById("metric-cpu").textContent = `${d.cpu_percent}%`;
@@ -432,7 +478,7 @@ async function loadPCMetrics() {
 
     // Also load recent action logs
     const logRes = await apiFetch("/api/pc/logs");
-    if (logRes.ok) {
+    if (logRes && logRes.ok) {
       const logs = await logRes.json();
       const container = document.getElementById("pc-action-logs");
       if (container && logs.length > 0) {
@@ -455,10 +501,14 @@ async function launchApp(appName) {
       body: JSON.stringify({ app_name: appName })
     });
     const d = await res.json();
-    alert(d.message);
+    if (!res.ok) {
+      alert(d.detail || d.message || `Could not launch ${appName}`);
+      return;
+    }
+    alert(d.message || `Launched ${appName} successfully.`);
     loadPCMetrics();
   } catch (e) {
-    alert("Error launching app: " + e.message);
+    alert("Error launching app: " + (e.message || "Server not reachable"));
   }
 }
 
@@ -470,14 +520,18 @@ async function openWeb(url) {
       body: JSON.stringify({ url })
     });
     const d = await res.json();
+    if (!res.ok) {
+      alert(d.detail || d.message || "Failed to open website");
+      return;
+    }
     if (d.needs_confirmation) {
       showConfirmationModal(d.confirmation_id, d.message);
     } else {
-      alert(d.message);
+      alert(d.message || `Opened ${url} in your browser.`);
     }
     loadPCMetrics();
   } catch (e) {
-    alert("Error opening website: " + e.message);
+    alert("Error opening website: " + (e.message || "Server not reachable"));
   }
 }
 
@@ -511,7 +565,7 @@ function setupMemoryHandlers() {
           loadMemories();
         } else {
           const err = await res.json();
-          alert("Security guard: " + err.detail);
+          alert("Security guard: " + (err.detail || err.message || "Invalid preference"));
         }
       } catch (e) {
         alert("Failed to save memory: " + e.message);
@@ -539,7 +593,7 @@ async function loadMemories() {
           <div class="memory-key">${m.key}</div>
           <div class="memory-val">${m.value}</div>
           <div class="memory-actions">
-            <button class="del-btn" onclick="deleteMemory(${m.id})" title="Delete memory">
+            <button class="del-btn" onclick="deleteMemory('${m.id}')" title="Delete memory">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
             </button>
           </div>
@@ -613,7 +667,7 @@ async function openFile(encodedPath, reveal) {
       body: JSON.stringify({ path, reveal })
     });
     const d = await res.json();
-    alert(d.message);
+    alert(d.message || d.detail || "File operation complete.");
   } catch (e) {
     alert("Error opening file: " + e.message);
   }
@@ -645,10 +699,14 @@ function setupImageStudioHandlers() {
           body: JSON.stringify({ prompt, width: w, height: h })
         });
         const d = await res.json();
-        alert(d.message);
+        if (!res.ok) {
+          alert(d.detail || d.message || "Image generation failed.");
+          return;
+        }
+        alert(d.message || "Artwork synthesized!");
         loadImages();
       } catch (e) {
-        alert("Image generation failed: " + e.message);
+        alert("Image generation failed: " + (e.message || "Server offline."));
       } finally {
         genBtn.disabled = false;
         genBtn.innerHTML = `
@@ -752,10 +810,14 @@ async function runWorkflow(workflowId) {
       body: JSON.stringify({ workflow_id: workflowId })
     });
     const d = await res.json();
-    alert(d.message);
+    if (!res.ok) {
+      alert(d.detail || d.message || "Could not start workflow");
+      return;
+    }
+    alert(d.message || "Workflow completed");
     loadTaskHistory();
   } catch (e) {
-    alert("Could not start workflow: " + e.message);
+    alert("Could not start workflow: " + (e.message || "Server offline"));
   }
 }
 
@@ -800,7 +862,7 @@ async function loadMobileInfo() {
 
       const taskerBox = document.getElementById("tasker-preview");
       if (taskerBox && data.token) {
-        taskerBox.textContent = `Method: POST\nURL: http://<PC_TAILSCALE_IP>:8000/api/chat\nHeaders:\n  Content-Type: application/json\n  X-Jenni-Token: ${data.token}\nBody:\n  {"message": "%VOICE_INPUT"}`;
+        taskerBox.textContent = `Method: POST\nURL: http://<PC_TAILSCALE_IP>:8000/api/chat\nHeaders:\n  Content-Type: application/json\n  Authorization: Bearer <YOUR_SESSION_TOKEN>\nBody:\n  {"message": "%VOICE_INPUT"}`;
       }
     }
   } catch (e) {}
@@ -863,8 +925,8 @@ async function resolveConfirmation(confirmationId, approved) {
       body: JSON.stringify({ confirmation_id: confirmationId, approved })
     });
     const d = await res.json();
-    alert(d.message);
+    alert(d.message || d.detail || "Confirmation processed.");
   } catch (e) {
-    alert("Error resolving confirmation: " + e.message);
+    alert("Error resolving confirmation: " + (e.message || "Server offline"));
   }
 }

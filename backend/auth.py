@@ -1,8 +1,9 @@
 from fastapi import Request, HTTPException, Security, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import socket
-from typing import Optional
+from typing import Optional, Dict, Any
 from backend.config import settings
+from backend.user_auth import verify_session_token
 
 security = HTTPBearer(auto_error=False)
 
@@ -39,38 +40,62 @@ def get_lan_and_tailscale_ips():
 
     return ips
 
+def _extract_token(request: Request, credentials: Optional[HTTPAuthorizationCredentials] = None) -> Optional[str]:
+    """Extract candidate token from Bearer header, X-Jenni-Token, or query param."""
+    if credentials and credentials.credentials:
+        return credentials.credentials.strip()
+
+    auth_header = request.headers.get("Authorization", "").strip()
+    if auth_header.startswith("Bearer "):
+        return auth_header[7:].strip()
+    elif auth_header:
+        return auth_header
+
+    token_header = request.headers.get("X-Jenni-Token", "").strip()
+    if token_header:
+        return token_header
+
+    token_param = request.query_params.get("token", "").strip()
+    if token_param:
+        return token_param
+
+    return None
+
 async def verify_auth(
     request: Request,
     credentials: Optional[HTTPAuthorizationCredentials] = Security(security)
-) -> bool:
+) -> Dict[str, Any]:
     """
     Authenticate requests:
     - If request is from localhost and REQUIRE_AUTH_FOR_LOCAL is False, allow immediately.
-    - If request is remote (e.g. Android phone), require matching AUTH_TOKEN in header or param.
+    - Otherwise:
+      1. Check MongoDB session via verify_session_token(token)
+      2. Or check static settings.AUTH_TOKEN (for Tasker / system automation)
     """
     client_ip = request.client.host if request.client else None
 
     # Check if local and allowed without auth
     if is_local_request(client_ip) and not settings.REQUIRE_AUTH_FOR_LOCAL:
-        return True
+        return {"username": "local_user", "role": "admin"}
 
-    # 1. Check Authorization: Bearer <token>
-    token_candidate = None
-    if credentials:
-        token_candidate = credentials.credentials
+    token = _extract_token(request, credentials)
 
-    # 2. Check X-Jenni-Token header
-    if not token_candidate:
-        token_candidate = request.headers.get("X-Jenni-Token")
-
-    # 3. Check query param ?token=...
-    if not token_candidate:
-        token_candidate = request.query_params.get("token")
-
-    if not token_candidate or token_candidate != settings.AUTH_TOKEN:
+    if not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unauthorized: Jenni AI requires a valid authentication token for remote access."
+            detail="Unauthorized: Jenni AI requires a valid session token. Please log in."
         )
 
-    return True
+    # 1. Check MongoDB session token
+    user = verify_session_token(token)
+    if user:
+        return user
+
+    # 2. Check static AUTH_TOKEN (backward compatibility for Tasker / system automation)
+    if settings.AUTH_TOKEN and token == settings.AUTH_TOKEN:
+        return {"username": "mobile_device", "role": "user"}
+
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Unauthorized: Invalid or expired session. Please log in again."
+    )

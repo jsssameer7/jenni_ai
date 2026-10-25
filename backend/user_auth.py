@@ -4,6 +4,7 @@ Handles registration, login, session tokens, and password hashing.
 """
 import hashlib
 import hmac
+import re
 import secrets
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any, List
@@ -92,10 +93,9 @@ def create_user(
 
 def login_user(username: str, password: str) -> Optional[Dict[str, Any]]:
     """Verify credentials and return session token dict, or None if invalid."""
-    import re as _re
     db = _db()
     user = db.users.find_one(
-        {"username": {"$regex": f"^{_re.escape(username.strip())}$", "$options": "i"}}
+        {"username": {"$regex": f"^{re.escape(username.strip())}$", "$options": "i"}}
     )
     if not user:
         return None
@@ -179,7 +179,3 @@ def list_users() -> List[Dict[str, Any]]:
             }
         )
     return out
-
-
-# re imported at module level for create_user
-import re
