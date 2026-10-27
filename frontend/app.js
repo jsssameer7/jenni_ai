@@ -143,6 +143,9 @@ function setupNavigation() {
       if (targetView) targetView.classList.add("active");
 
       if (viewTitle) viewTitle.textContent = titles[targetId] || "Jenni AI";
+      if (targetId === "images-tab") {
+        loadImages();
+      }
       if (sidebar) sidebar.classList.remove("open");
     });
   });
@@ -716,12 +719,12 @@ function setupImageStudioHandlers() {
           body: JSON.stringify({ prompt, width: w, height: h })
         });
         const d = await res.json();
-        if (!res.ok) {
+        if (!res.ok || d.success === false) {
           alert(d.detail || d.message || "Image generation failed.");
           return;
         }
         await loadImages();
-        if (d.url) {
+        if (d.url && d.success) {
           openImageModal(d.url, d.filename || "jenni_ai.png");
         }
       } catch (e) {
