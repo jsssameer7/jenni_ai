@@ -184,6 +184,75 @@ class AIService:
         """
         q = query.lower()
 
+        # 0. Python & Programming Programs (Adding two numbers, calculator, algorithms, etc.)
+        if any(w in q for w in ["add", "adding", "sum", "plus"]) and any(w in q for w in ["number", "numbers", "tow", "two"]):
+            return (
+                "### 🐍 Python Program to Add Two Numbers\n\n"
+                "Here is the complete Python code to take two numbers as input from the user and print their sum:\n\n"
+                "```python\n"
+                "# Python Program: Add Two Numbers with User Input\n\n"
+                "# Step 1: Prompt the user for input and convert string to float\n"
+                "num1 = float(input(\"Enter first number: \"))\n"
+                "num2 = float(input(\"Enter second number: \"))\n\n"
+                "# Step 2: Compute the sum\n"
+                "total = num1 + num2\n\n"
+                "# Step 3: Display the formatted result\n"
+                "print(f\"The sum of {num1} and {num2} is: {total}\")\n"
+                "```\n\n"
+                "#### 🔍 Code Explanation:\n"
+                "1. **`input()`**: Takes text input from the terminal.\n"
+                "2. **`float(...)`**: Converts the string into a numeric float so you can add both whole numbers (e.g. `10`) and decimal numbers (e.g. `3.14`).\n"
+                "3. **`+` operator**: Performs arithmetic addition.\n"
+                "4. **f-string (`f\"...\"`)**: Formats variables directly into the output message.\n\n"
+                "#### 💻 Example Output:\n"
+                "```text\n"
+                "Enter first number: 12.5\n"
+                "Enter second number: 7.5\n"
+                "The sum of 12.5 and 7.5 is: 20.0\n"
+                "```"
+            )
+
+        if "calculator" in q and ("python" in q or "program" in q or "code" in q):
+            return (
+                "### 🧮 Simple Python Calculator Program\n\n"
+                "```python\n"
+                "def calculate():\n"
+                "    a = float(input(\"Enter first number: \"))\n"
+                "    op = input(\"Enter operator (+, -, *, /): \").strip()\n"
+                "    b = float(input(\"Enter second number: \"))\n\n"
+                "    if op == '+':\n"
+                "        print(f\"{a} + {b} = {a + b}\")\n"
+                "    elif op == '-':\n"
+                "        print(f\"{a} - {b} = {a - b}\")\n"
+                "    elif op == '*':\n"
+                "        print(f\"{a} * {b} = {a * b}\")\n"
+                "    elif op == '/':\n"
+                "        if b != 0:\n"
+                "            print(f\"{a} / {b} = {a / b}\")\n"
+                "        else:\n"
+                "            print(\"Error: Cannot divide by zero!\")\n"
+                "    else:\n"
+                "        print(\"Invalid operator!\")\n\n"
+                "calculate()\n"
+                "```"
+            )
+
+        if any(w in q for w in ["reverse", "palindrome"]) and any(w in q for w in ["string", "word", "python"]):
+            return (
+                "### 🔄 Python String Reversal\n\n"
+                "In Python, the cleanest way to reverse a string is using slice notation `[::-1]`:\n\n"
+                "```python\n"
+                "text = input(\"Enter a string: \")\n"
+                "reversed_text = text[::-1]\n"
+                "print(f\"Reversed: {reversed_text}\")\n\n"
+                "# Check for Palindrome\n"
+                "if text.lower() == reversed_text.lower():\n"
+                "    print(\"It is a Palindrome!\")\n"
+                "else:\n"
+                "    print(\"Not a palindrome.\")\n"
+                "```"
+            )
+
         # 1. How to run / setup
         if any(w in q for w in ["how to run", "how too run", "how do i run", "start the app", "how run", "run it"]):
             return (
@@ -342,7 +411,7 @@ class AIService:
         # 4C. Local Ollama
         if not ai_reply:
             try:
-                async with httpx.AsyncClient(timeout=min(settings.OLLAMA_TIMEOUT, 25.0)) as client:
+                async with httpx.AsyncClient(timeout=settings.OLLAMA_TIMEOUT) as client:
                     res = await client.post(
                         f"{settings.OLLAMA_BASE_URL}/api/chat",
                         json={

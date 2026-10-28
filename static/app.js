@@ -69,6 +69,67 @@ async function callOpenAIDirect(prompt, model, apiKey) {
 function clientExplainKnowledge(query) {
   const q = (query || "").toLowerCase();
 
+  // 0. Python & Programming Questions (Add two numbers, calculator, etc.)
+  if ((q.includes("add") || q.includes("adding") || q.includes("sum") || q.includes("plus")) && (q.includes("number") || q.includes("numbers") || q.includes("tow") || q.includes("two"))) {
+    return `### 🐍 Python Program to Add Two Numbers
+
+Here is the complete Python code to take two numbers as input from the user and print their sum:
+
+\`\`\`python
+# Python Program: Add Two Numbers with User Input
+
+# Step 1: Prompt the user for input and convert string to float
+num1 = float(input("Enter first number: "))
+num2 = float(input("Enter second number: "))
+
+# Step 2: Compute the sum
+total = num1 + num2
+
+# Step 3: Display the formatted result
+print(f"The sum of {num1} and {num2} is: {total}")
+\`\`\`
+
+#### 🔍 Code Explanation:
+1. **\`input()\`**: Takes text input from the terminal.
+2. **\`float(...)\`**: Converts the string into a numeric float so you can add both whole numbers (e.g. \`10\`) and decimal numbers (e.g. \`3.14\`).
+3. **\`+\` operator**: Performs arithmetic addition.
+4. **f-string (\`f"..."\`)**: Formats variables cleanly into the output message.
+
+#### 💻 Example Output:
+\`\`\`text
+Enter first number: 12.5
+Enter second number: 7.5
+The sum of 12.5 and 7.5 is: 20.0
+\`\`\``;
+  }
+
+  if (q.includes("calculator") && (q.includes("python") || q.includes("program") || q.includes("code"))) {
+    return `### 🧮 Simple Python Calculator Program
+
+\`\`\`python
+def calculate():
+    a = float(input("Enter first number: "))
+    op = input("Enter operator (+, -, *, /): ").strip()
+    b = float(input("Enter second number: "))
+
+    if op == '+':
+        print(f"{a} + {b} = {a + b}")
+    elif op == '-':
+        print(f"{a} - {b} = {a - b}")
+    elif op == '*':
+        print(f"{a} * {b} = {a * b}")
+    elif op == '/':
+        if b != 0:
+            print(f"{a} / {b} = {a / b}")
+        else:
+            print("Error: Cannot divide by zero!")
+    else:
+        print("Invalid operator!")
+
+calculate()
+\`\`\``;
+  }
+
   // 1. How to run / setup
   if (q.includes("how to run") || q.includes("how too run") || q.includes("how run") || q.includes("run it") || q.includes("start") || q.includes("setup")) {
     return `### 🚀 How to Run Jenni AI on Your Windows 11 PC
