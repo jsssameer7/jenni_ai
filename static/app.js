@@ -76,8 +76,117 @@ function copyPhoneUrl() {
   });
 }
 
-// Helper for authenticated fetch
+// Helper for authenticated fetch with GitHub Pages demo fallback
 async function apiFetch(url, options = {}) {
+  const isGH = window.location.hostname.endsWith('github.io');
+  
+  if (isGH) {
+    // Simulated interactive responses for GitHub Pages static showcase
+    if (url.includes("/api/pc/status")) {
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          platform: "Windows 11 (Live Showcase)",
+          cpu_percent: Math.floor(20 + Math.random() * 30),
+          ram_total_gb: 16.0,
+          ram_used_gb: 6.8,
+          ram_percent: 42.5,
+          disk_free_gb: 388.5,
+          disk_percent: 46.2,
+          battery: { percent: 92, power_plugged: true, secs_left: null },
+          gpu: {
+            model: "NVIDIA GeForce RTX 3050 Laptop GPU",
+            total_vram_mb: 4096,
+            used_vram_mb: 1200,
+            free_vram_mb: 2896,
+            temperature_c: 48
+          }
+        })
+      };
+    }
+    if (url.includes("/api/pc/logs")) {
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ([
+          { action_type: "open_app", command: "whatsapp", status: "success", created_at: "Just now" },
+          { action_type: "open_app", command: "vscode", status: "success", created_at: "2 mins ago" }
+        ])
+      };
+    }
+    if (url.includes("/api/chat")) {
+      let userQuery = "your message";
+      try {
+        if (options.body) {
+          userQuery = JSON.parse(options.body).message || userQuery;
+        }
+      } catch (e) {}
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          role: "assistant",
+          content: `Hello! You are exploring the Jenni AI demo on GitHub Pages. You asked: "${userQuery}".\n\nTo control your actual Windows 11 PC, launch native apps (WhatsApp, VS Code, Spotify), and use local Ollama AI offline, run Jenni AI locally using \`run_windows.bat\`!`,
+          action: null
+        })
+      };
+    }
+    if (url.includes("/api/images/list")) {
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ([
+          { filename: "jenni_ai_car.png", url: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=512&h=512&fit=crop", size_kb: 48.2, created_at: "Today" },
+          { filename: "jenni_ai_cat.png", url: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=512&h=512&fit=crop", size_kb: 42.1, created_at: "Today" }
+        ])
+      };
+    }
+    if (url.includes("/api/images/status")) {
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          online: false,
+          gpu: { model: "NVIDIA GeForce RTX 3050 (4GB VRAM)", total_vram_mb: 4096, recommendation: "Optimized for SD 1.5 / SD-Turbo (--lowvram)" }
+        })
+      };
+    }
+    if (url.includes("/api/tasks/workflows")) {
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ([
+          { id: "wf_dev", name: "Developer Workspace Launch", description: "Opens VS Code, launches terminal, and checks git status.", steps: ["Launch VS Code", "Open Terminal", "Git Status Check"] },
+          { id: "wf_health", name: "Deep System Health Check", description: "Checks CPU, RAM, battery health, and GPU temperature.", steps: ["CPU Scan", "RAM Diagnostic", "Battery Check"] }
+        ])
+      };
+    }
+    if (url.includes("/api/memories")) {
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ([
+          { key: "User Name", value: "Sameer", category: "identity", created_at: "Today" },
+          { key: "Preferred Editor", value: "VS Code", category: "preference", created_at: "Today" }
+        ])
+      };
+    }
+    if (url.includes("/api/mobile/info")) {
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          connection_urls: [
+            { type: "Tailscale Mesh", url: "http://100.102.38.116:8000" },
+            { type: "Local WiFi LAN", url: "http://192.168.184.226:8000" }
+          ],
+          token: "jenni-mobile-token-2026"
+        })
+      };
+    }
+  }
+
   const headers = Object.assign({}, options.headers || {});
   const token = getSessionToken();
   if (token) {
