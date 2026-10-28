@@ -41,8 +41,19 @@ class Settings(BaseSettings):
     OLLAMA_MODEL: str = "qwen2.5:3b"
     OLLAMA_TIMEOUT: float = 60.0
     
+# Multi-Model AI Engine Settings
+    DEFAULT_AI_PROVIDER: str = "auto"   # "auto", "gemini", "openai", "ollama"
+    
+    # Google Gemini API
+    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+    GEMINI_MODEL: str = "gemini-1.5-flash"
+    
+    # OpenAI / ChatGPT API
+    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
+    OPENAI_MODEL: str = "gpt-4o-mini"
+    
     # Optional Online AI Provider
-    ONLINE_AI_PROVIDER: str = "none"  # "none", "openai", "groq"
+    ONLINE_AI_PROVIDER: str = "none"  # "none", "openai", "gemini", "groq"
     ONLINE_AI_API_KEY: str = ""
     ONLINE_AI_BASE_URL: str = "https://api.openai.com/v1"
     ONLINE_AI_MODEL: str = "gpt-4o-mini"

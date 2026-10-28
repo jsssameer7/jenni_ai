@@ -75,6 +75,7 @@ class ChatRequest(BaseModel):
     message: str
     session_id: Optional[str] = "default"
     model: Optional[str] = None
+    api_key: Optional[str] = None
 
 class MemoryRequest(BaseModel):
     key: str
@@ -206,9 +207,15 @@ async def chat_endpoint(req: ChatRequest):
     res = await ai_service.chat(
         user_message=req.message,
         session_id=req.session_id or "default",
-        model=req.model
+        model=req.model,
+        api_key=req.api_key
     )
     return res
+
+@app.get("/api/ai/models")
+async def get_supported_ai_models():
+    """List available cloud and local AI models (Gemini, ChatGPT, Ollama)."""
+    return await ai_service.get_models_status()
 
 @app.get("/api/chat/history", dependencies=[Depends(verify_auth)])
 async def get_chat_history(session_id: str = "default", limit: int = 30):
