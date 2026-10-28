@@ -374,6 +374,7 @@ async def get_mobile_integration_info():
 FRONTEND_DIR = settings.BASE_DIR / "frontend"
 if FRONTEND_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
+    app.mount("/frontend", StaticFiles(directory=str(FRONTEND_DIR)), name="frontend")
 
 @app.get("/")
 async def serve_landing():
@@ -409,3 +410,18 @@ async def serve_ad():
     if ad_file.exists():
         return FileResponse(ad_file)
     return {"message": "Ad video not found."}
+
+@app.get("/{file_path:path}")
+async def serve_static_fallback(file_path: str):
+    """Fallback route to serve static assets directly from frontend directory."""
+    f = FRONTEND_DIR / file_path
+    if f.exists() and f.is_file():
+        media_type = None
+        if file_path.endswith(".css"):
+            media_type = "text/css"
+        elif file_path.endswith(".js"):
+            media_type = "application/javascript"
+        elif file_path.endswith(".html"):
+            media_type = "text/html"
+        return FileResponse(f, media_type=media_type)
+    raise HTTPException(status_code=404, detail="File not found")
