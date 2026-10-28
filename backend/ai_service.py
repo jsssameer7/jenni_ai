@@ -15,8 +15,8 @@ You assist the user on their Windows 11 PC and connected Android 12 phone.
 Key Attributes:
 1. Name: You are Jenni AI. Always introduce or refer to yourself as Jenni AI when asked.
 2. Tone: Friendly, articulate, concise, and helpful. You explain programming and technical concepts simply and clearly.
-3. Capabilities: You can control approved PC applications (Calculator, Notepad, VS Code, File Explorer), search local files, manage persistent memories, generate images, and run automated workflows.
-4. Privacy & Safety: You never ask for or store passwords or API keys. You respect system boundaries.
+3. Full PC Application Access: You have FULL ACCESS and authority to directly launch and control desktop applications on this Windows 11 PC (including WhatsApp, VS Code, Spotify, Chrome, Photoshop, Notepad, Calculator, Discord, Telegram, Android Studio, and all installed software). NEVER state that you cannot open or control applications on the user's PC.
+4. Privacy & Safety: You respect system boundaries.
 
 {memory_context}
 """
@@ -49,35 +49,20 @@ class AIService:
     @staticmethod
     def detect_instant_intent(user_text: str) -> Optional[Tuple[str, Dict[str, Any]]]:
         """
-        Fast intent recognition for instant PC actions (e.g. 'open calculator', 'create cat image').
-        Returns (action_type, execution_result) or None.
+        Fast intent recognition for instant PC actions (open apps, open websites, search files, generate images).
+        Provides full access to Windows 11 applications.
         """
-        text = user_text.strip().lower()
+        clean_text = user_text.strip()
+        text_lower = clean_text.lower()
 
-        # 1. Open App Intent
-        open_match = re.search(r"(?:open|launch|start|run)\s+(calculator|calc|notepad|vscode|vs code|code|explorer|file explorer|browser|paint)", text)
-        if open_match:
-            app_raw = open_match.group(1).replace("vs code", "vscode")
-            res = pc_control_service.open_app(app_raw)
-            return ("open_app", res)
-
-        # 2. Open Website Intent
-        web_match = re.search(r"(?:open|go to|browse|visit)\s+(https?://[^\s]+|[a-zA-Z0-9\-\.]+\.(?:com|org|io|net|edu|dev|ai))", text)
+        # 1. Open Website Intent (explicit domains or URLs)
+        web_match = re.search(r"(?:open|go to|browse|visit)\s+(https?://[^\s]+|[a-zA-Z0-9\-\.]+\.(?:com|org|io|net|edu|dev|ai))", text_lower)
         if web_match:
             url = web_match.group(1)
             res = pc_control_service.open_website(url)
             return ("open_website", res)
 
-        # 3. File Search Intent
-        search_match = re.search(r"(?:find|search(?: for)?|locate)\s+(?:file|files|document|documents)?\s*(?:named|called)?\s*([a-zA-Z0-9_\-\.\*]+)", text)
-        if search_match and len(search_match.group(1)) > 1:
-            query = search_match.group(1).strip()
-            if query not in ["the", "me", "a", "an", "my"]:
-                files = file_service.search_files(query=query, max_results=5)
-                return ("file_search", {"query": query, "files": files})
-
-        # 4. Generate Image Intent (Handles 'create cat image', 'make a car picture', 'draw a sunset', 'image of red car', etc.)
-        clean_text = user_text.strip()
+        # 2. Generate Image Intent (e.g. 'create cat image', 'draw a sunset', 'make an image of a red car')
         m1 = re.search(r"^(?:please\s+)?(?:generate|create|draw|make|paint|synthesize|show\s+me)\s+(?:an?\s+)?(.+?)\s+(?:image|picture|photo|photograph|art|artwork|wallpaper|drawing|illustration)$", clean_text, re.IGNORECASE)
         m2 = re.search(r"^(?:please\s+)?(?:generate|create|draw|make|paint|synthesize|show\s+me)\s+(?:an?\s+)?(?:image|picture|photo|photograph|art|artwork|wallpaper|drawing|illustration)(?:\s+(?:of|showing|depicting|about))?\s*(.+)$", clean_text, re.IGNORECASE)
         m3 = re.search(r"^(?:please\s+)?(?:draw|paint)\s+(?:an?\s+)?(.+)$", clean_text, re.IGNORECASE)
@@ -96,6 +81,24 @@ class AIService:
         if gen_prompt:
             gen_prompt = image_service.clean_prompt_for_generation(gen_prompt)
             return ("generate_image", {"prompt": gen_prompt})
+
+        # 3. File Search Intent
+        search_match = re.search(r"(?:find|search(?: for)?|locate)\s+(?:file|files|document|documents)?\s*(?:named|called)?\s*([a-zA-Z0-9_\-\.\*]+)", text_lower)
+        if search_match and len(search_match.group(1)) > 1:
+            query = search_match.group(1).strip()
+            if query not in ["the", "me", "a", "an", "my"]:
+                files = file_service.search_files(query=query, max_results=5)
+                return ("file_search", {"query": query, "files": files})
+
+        # 4. Open Application Intent (Full Access to ANY Windows 11 PC application)
+        # Matches: 'open whatsapp', 'launch spotify', 'start chrome', 'run vs code', 'open calculator', etc.
+        open_match = re.search(r"^(?:please\s+)?(?:open|launch|start|run)\s+(?:the\s+)?([a-zA-Z0-9\s_\-\.\+]+)$", text_lower)
+        if open_match:
+            app_raw = open_match.group(1).strip()
+            # Ignore false triggers like "open it", "run this", "start now"
+            if app_raw not in ["it", "this", "that", "up", "now", "a file", "image", "an image"]:
+                res = pc_control_service.open_app(app_raw)
+                return ("open_app", res)
 
         return None
 
@@ -194,15 +197,15 @@ class AIService:
                 except Exception as ex:
                     ai_reply = f"Jenni AI: Could not reach Ollama at {settings.OLLAMA_BASE_URL} or online provider. Error: {str(ex)}"
             else:
-                # If Ollama is offline but an image was generated, respond with a friendly message
-                if executed_action and executed_action.get("type") == "image_generated":
+                # If Ollama is offline but an action was executed, respond with a crisp friendly confirmation
+                if executed_action and executed_action.get("type") == "app_opened":
+                    ai_reply = executed_action["data"].get("message", "Application launched successfully on your Windows 11 PC.")
+                    model_used = "Jenni PC Controller"
+                elif executed_action and executed_action.get("type") == "image_generated":
                     img_data = executed_action["data"]
                     prompt_label = img_data.get("prompt", "your prompt")
                     ai_reply = f"Here is your AI generated image for **\"{prompt_label}\"**! It has been generated without watermarks and saved to your Image Studio."
                     model_used = "Jenni Neural Engine"
-                elif executed_action and executed_action.get("type") == "app_opened":
-                    ai_reply = executed_action["data"].get("message", "Application launched successfully.")
-                    model_used = "Jenni System Controller"
                 elif executed_action and executed_action.get("type") == "website_opened":
                     ai_reply = executed_action["data"].get("message", "Website opened successfully.")
                     model_used = "Jenni System Controller"
@@ -225,7 +228,6 @@ class AIService:
         # Generate clean spoken text for voice TTS (strip markdown and codeblocks)
         clean_spoken = re.sub(r"```[\s\S]*?```", "Code block omitted.", ai_reply)
         clean_spoken = re.sub(r"[\*\_#`]", "", clean_spoken).strip()
-        # Keep spoken summary under 200 characters for snappy voice response
         if len(clean_spoken) > 220:
             first_sentence = clean_spoken.split(". ")[0]
             clean_spoken = first_sentence + "." if not first_sentence.endswith(".") else first_sentence

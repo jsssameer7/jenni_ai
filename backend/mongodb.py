@@ -89,7 +89,13 @@ def _create_indexes(db):
 # ── Accessors ────────────────────────────────────────────────────────────────
 
 def get_sync_db():
-    """Return the synchronous PyMongo database handle."""
+    """Return the synchronous PyMongo database handle, auto-initialising if needed."""
+    global _sync_db
+    if _sync_db is None:
+        try:
+            init_mongo()
+        except Exception:
+            pass
     if _sync_db is None:
         raise RuntimeError("MongoDB not initialised. Call init_mongo() first.")
     return _sync_db

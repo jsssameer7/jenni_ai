@@ -159,15 +159,18 @@ def delete_memory_by_key(key: str) -> bool:
 # ── Audit Logs ─────────────────────────────────────────────────────────────
 
 def log_action(action_type: str, command: str, status: str, details: Optional[Dict] = None):
-    _db().action_logs.insert_one(
-        {
-            "action_type": action_type,
-            "command": command,
-            "status": status,
-            "details": details or {},
-            "created_at": _now(),
-        }
-    )
+    try:
+        _db().action_logs.insert_one(
+            {
+                "action_type": action_type,
+                "command": command,
+                "status": status,
+                "details": details or {},
+                "created_at": _now(),
+            }
+        )
+    except Exception:
+        pass
 
 
 def get_recent_action_logs(limit: int = 50) -> List[Dict[str, Any]]:

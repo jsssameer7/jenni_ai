@@ -3,11 +3,91 @@ import webbrowser
 import psutil
 import uuid
 import json
+import re
+import time
 from typing import Dict, Any, Optional, List
 from urllib.parse import urlparse
 from backend.config import settings
 from backend.database import log_action
 from backend.mongodb import get_sync_db
+
+# Cache for installed Windows StartApps
+_installed_apps_cache: List[Dict[str, str]] = []
+_last_cache_time: float = 0.0
+
+# Known common URI schemes and binary aliases for Windows 11
+KNOWN_APP_LAUNCHERS: Dict[str, str] = {
+    "whatsapp": "whatsapp:",
+    "spotify": "spotify:",
+    "chrome": "chrome",
+    "google chrome": "chrome",
+    "edge": "msedge",
+    "msedge": "msedge",
+    "browser": "start",
+    "vscode": "code",
+    "vs code": "code",
+    "code": "code",
+    "visual studio code": "code",
+    "calc": "calc.exe",
+    "calculator": "calc.exe",
+    "notepad": "notepad.exe",
+    "notes": "notepad.exe",
+    "explorer": "explorer.exe",
+    "file explorer": "explorer.exe",
+    "files": "explorer.exe",
+    "my computer": "explorer.exe",
+    "paint": "mspaint.exe",
+    "mspaint": "mspaint.exe",
+    "terminal": "wt.exe",
+    "windows terminal": "wt.exe",
+    "cmd": "cmd.exe",
+    "command prompt": "cmd.exe",
+    "powershell": "powershell.exe",
+    "task manager": "taskmgr.exe",
+    "taskmgr": "taskmgr.exe",
+    "settings": "ms-settings:",
+    "windows settings": "ms-settings:",
+    "camera": "microsoft.windows.camera:",
+    "photos": "ms-photos:",
+    "clock": "ms-clock:",
+    "alarms": "ms-clock:",
+    "discord": "discord:",
+    "telegram": "tg:",
+    "teams": "msteams:",
+    "zoom": "zoommtg:",
+    "word": "winword.exe",
+    "ms word": "winword.exe",
+    "microsoft word": "winword.exe",
+    "excel": "excel.exe",
+    "ms excel": "excel.exe",
+    "powerpoint": "powerpnt.exe",
+    "ppt": "powerpnt.exe",
+    "android studio": "studio64.exe",
+    "photoshop": "photoshop",
+    "adobe photoshop": "photoshop"
+}
+
+def get_all_installed_apps() -> List[Dict[str, str]]:
+    """Query and cache all installed Windows 11 StartApps."""
+    global _installed_apps_cache, _last_cache_time
+    now = time.time()
+    if _installed_apps_cache and (now - _last_cache_time) < 600:
+        return _installed_apps_cache
+
+    try:
+        cmd = ["powershell.exe", "-NoProfile", "-Command", "Get-StartApps | ConvertTo-Json"]
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=8)
+        if res.returncode == 0 and res.stdout.strip():
+            raw = json.loads(res.stdout.strip())
+            if isinstance(raw, list):
+                _installed_apps_cache = [{"name": a.get("Name", ""), "appid": a.get("AppID", "")} for a in raw if a.get("Name") and a.get("AppID")]
+            elif isinstance(raw, dict):
+                _installed_apps_cache = [{"name": raw.get("Name", ""), "appid": raw.get("AppID", "")}]
+            _last_cache_time = now
+    except Exception:
+        pass
+
+    return _installed_apps_cache
 
 class PCControlService:
     @staticmethod
@@ -61,49 +141,85 @@ class PCControlService:
 
     @staticmethod
     def open_app(app_name: str) -> Dict[str, Any]:
-        """Launch an approved application from the allowlist."""
-        normalized = app_name.strip().lower()
-        if normalized not in settings.APPROVED_APPS:
-            log_action("open_app", app_name, "rejected", {"reason": "Not in approved apps allowlist"})
-            return {
-                "success": False,
-                "message": f"Application '{app_name}' is not in the approved applications list.",
-                "allowed_apps": list(settings.APPROVED_APPS.keys())
-            }
+        """
+        Full access PC application launcher for Windows 11:
+        1. Checks well-known protocols/binaries (WhatsApp, Spotify, VS Code, Chrome, etc.)
+        2. Dynamically scans installed Windows StartApps (UWP & Win32)
+        3. Attempts direct Windows shell execution
+        """
+        clean_name = app_name.strip().lower()
+        clean_name = re.sub(r"^(?:the\s+)?app\s+", "", clean_name)
+        clean_name = re.sub(r"\s+app$", "", clean_name).strip()
 
-        executable = settings.APPROVED_APPS[normalized]
+        # Step 1: Check known launchers & protocols
+        if clean_name in KNOWN_APP_LAUNCHERS:
+            target = KNOWN_APP_LAUNCHERS[clean_name]
+            try:
+                if target.endswith(":"):
+                    subprocess.Popen(f"cmd.exe /c start {target}", shell=True)
+                else:
+                    subprocess.Popen(f"cmd.exe /c start \"\" {target}", shell=True)
+                
+                log_action("open_app", clean_name, "success", {"target": target})
+                return {
+                    "success": True,
+                    "message": f"Successfully launched {app_name.title()} on your Windows 11 PC.",
+                    "app": clean_name
+                }
+            except Exception as ex:
+                pass
+
+        # Step 2: Search installed Windows StartApps dynamically
+        installed = get_all_installed_apps()
+        matched_app = None
+        
+        # Priority A: Exact match
+        for a in installed:
+            if a["name"].lower() == clean_name:
+                matched_app = a
+                break
+                
+        # Priority B: Substring / Word match
+        if not matched_app:
+            for a in installed:
+                if clean_name in a["name"].lower() or a["name"].lower().startswith(clean_name):
+                    matched_app = a
+                    break
+
+        if matched_app:
+            appid = matched_app["appid"]
+            app_title = matched_app["name"]
+            try:
+                # Launch via shell:AppsFolder
+                subprocess.Popen(f'cmd.exe /c start "" "shell:AppsFolder\\{appid}"', shell=True)
+                log_action("open_app", clean_name, "success", {"appid": appid, "title": app_title})
+                return {
+                    "success": True,
+                    "message": f"Successfully launched {app_title} on your Windows 11 PC.",
+                    "app": app_title
+                }
+            except Exception as e:
+                pass
+
+        # Step 3: Generic shell launch fallback
         try:
-            if normalized in ("vscode", "code"):
-                subprocess.Popen("cmd.exe /c start \"\" code", shell=True)
-            elif normalized in ("calc", "calculator"):
-                subprocess.Popen("cmd.exe /c start \"\" calc.exe", shell=True)
-            elif normalized == "notepad":
-                subprocess.Popen("cmd.exe /c start \"\" notepad.exe", shell=True)
-            elif normalized in ("explorer", "file explorer"):
-                subprocess.Popen("cmd.exe /c start \"\" explorer.exe", shell=True)
-            elif normalized == "paint":
-                subprocess.Popen("cmd.exe /c start \"\" mspaint.exe", shell=True)
-            elif executable == "start":
-                subprocess.Popen("cmd.exe /c start", shell=True)
-            else:
-                subprocess.Popen(f"cmd.exe /c start \"\" {executable}", shell=True)
-
-            log_action("open_app", normalized, "success", {"executable": executable})
+            subprocess.Popen(f"cmd.exe /c start \"\" \"{clean_name}\"", shell=True)
+            log_action("open_app", clean_name, "success", {"fallback": clean_name})
             return {
                 "success": True,
-                "message": f"Successfully launched {app_name.capitalize()} on your PC.",
-                "app": normalized
+                "message": f"Sent launch command for '{app_name.title()}' to Windows 11.",
+                "app": clean_name
             }
         except Exception as e:
-            log_action("open_app", normalized, "error", {"error": str(e)})
+            log_action("open_app", clean_name, "error", {"error": str(e)})
             return {
                 "success": False,
-                "message": f"Could not launch {app_name}: {str(e)}"
+                "message": f"Could not launch application '{app_name}': {str(e)}"
             }
 
     @staticmethod
     def open_website(url: str) -> Dict[str, Any]:
-        """Open an approved website in default browser."""
+        """Open a website in the default browser."""
         target = url.strip()
         if not target.startswith("http://") and not target.startswith("https://"):
             target = "https://" + target
@@ -113,22 +229,6 @@ class PCControlService:
             domain = parsed.netloc.lower()
             if domain.startswith("www."):
                 domain = domain[4:]
-
-            # Check if domain matches or belongs to approved list
-            approved = any(domain == app or domain.endswith("." + app) for app in settings.APPROVED_WEBSITES)
-            if not approved:
-                # Require confirmation for unlisted website
-                conf_id = PCControlService.create_pending_confirmation(
-                    action_type="open_website",
-                    description=f"Open unlisted website: {target}",
-                    payload={"url": target}
-                )
-                return {
-                    "success": False,
-                    "needs_confirmation": True,
-                    "confirmation_id": conf_id,
-                    "message": f"Website '{domain}' is not in the default allowlist. Jenni AI needs your confirmation to open it."
-                }
 
             webbrowser.open(target)
             log_action("open_website", target, "success", {"domain": domain})
@@ -171,7 +271,6 @@ class PCControlService:
                 webbrowser.open(payload["url"])
                 return {"success": True, "message": f"Approved and opened {payload['url']}."}
             elif action_type == "delete_file":
-                # Simulated safe delete execution
                 return {"success": True, "message": f"Approved deletion of {payload['path']}."}
         
         return {"success": True, "message": f"Action {conf_id} was successfully {new_status}."}
