@@ -1,6 +1,18 @@
 # Jenni AI — Your Personal Assistant
 
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Showcase-38bdf8?style=for-the-badge&logo=github)](https://jsssameer7.github.io/jenni_ai/)
+[![Ad Trailer](https://img.shields.io/badge/Official%20Trailer-Watch%20Online-a78bfa?style=for-the-badge&logo=youtube)](https://jsssameer7.github.io/jenni_ai/frontend/ad_video.html)
+[![FastAPI](https://img.shields.io/badge/FastAPI-v0.115-059669?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Local%20Atlas-47a248?style=for-the-badge&logo=mongodb)](https://mongodb.com)
+[![Ollama](https://img.shields.io/badge/Ollama-Qwen2.5%3A3b-black?style=for-the-badge)](https://ollama.com)
+
 > An intelligent, extensible AI assistant inspired by Jarvis, tailored for **Windows 11** PC and **Android 12** phone.
+
+🌐 **Live Deployed Pages**:
+- **Official Website & Feature Showcase**: [https://jsssameer7.github.io/jenni_ai/](https://jsssameer7.github.io/jenni_ai/)
+- **Cinematic Interactive Ad Video**: [https://jsssameer7.github.io/jenni_ai/frontend/ad_video.html](https://jsssameer7.github.io/jenni_ai/frontend/ad_video.html)
+- **Live Web Client Mockup**: [https://jsssameer7.github.io/jenni_ai/frontend/dashboard.html](https://jsssameer7.github.io/jenni_ai/frontend/dashboard.html)
+
 
 Jenni AI combines local large language models (via **Ollama**), persistent SQLite memory, safe PC automation, offline Windows speech synthesis (**pyttsx3**), browser-based multi-language voice recognition (supporting English and Indian languages), **ComfyUI** image generation, and secure **Tailscale** private networking for your phone.
 
@@ -11,8 +23,9 @@ Jenni AI combines local large language models (via **Ollama**), persistent SQLit
 - **Intelligent Assistant Persona**: Friendly, articulate, and natural assistant personality named **Jenni AI**. Answers general questions, explains code clearly, and manages PC tasks.
 - **Local AI First**: Powered out of the box by local **Ollama** (`qwen2.5:3b`), running 100% offline and privately on your machine.
 - **Persistent Personal Memory**: Remembers user preferences and facts (e.g. *"Remember that I prefer Python and dark mode"*). Includes a strict **Zero-Secrets Guard** that automatically blocks saving passwords or API keys.
-- **Safe PC Control**:
-  - Open approved applications: Calculator, Notepad, VS Code, File Explorer, Paint.
+- **Full Access PC Application Control**:
+  - Direct execution of all Windows 11 desktop applications: **WhatsApp Desktop**, **Spotify**, **Google Chrome**, **VS Code**, **Photoshop**, **Android Studio**, **Discord**, **Telegram**, **Calculator**, **Notepad**, and all 190+ software detected via Windows `Get-StartApps`.
+  - Protocol-level launching (`whatsapp:`, `spotify:`, `ms-settings:`) and native shell application handles.
   - Open approved websites (Google, GitHub, StackOverflow, etc.).
   - Search approved folders (Desktop, Documents, Downloads, Project) with path traversal protection.
   - Confirmation modals for sensitive actions.
