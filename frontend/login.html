@@ -265,7 +265,7 @@
 
   <main class="page">
     <!-- Brand -->
-    <a href="/" class="brand">
+    <a href="../index.html" class="brand">
       <div class="brand-orb"><div class="brand-orb-inner"></div></div>
       <span class="brand-name">Jenni AI</span>
     </a>
@@ -398,7 +398,7 @@
       const token = localStorage.getItem('jenni_session_token');
       if (token) {
         fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + token } })
-          .then(r => { if (r.ok) window.location.replace('/app'); })
+          .then(r => { if (r.ok) window.location.replace('dashboard.html'); })
           .catch(() => {});
       }
     })();
@@ -464,7 +464,7 @@
           localStorage.setItem('jenni_session_token', data.token);
           localStorage.setItem('jenni_user', JSON.stringify(data.user));
           showAlert('✓ Login successful! Launching Jenni AI...', 'success');
-          setTimeout(() => window.location.replace('/app'), 900);
+          setTimeout(() => window.location.replace('dashboard.html'), 900);
         } else {
           showAlert(data.detail || 'Invalid username or password.');
         }
@@ -528,7 +528,7 @@
           localStorage.setItem('jenni_session_token', loginData.token);
           localStorage.setItem('jenni_user', JSON.stringify(loginData.user));
           showAlert('✓ Welcome to Jenni AI! Launching...', 'success');
-          setTimeout(() => window.location.replace('/app'), 800);
+          setTimeout(() => window.location.replace('dashboard.html'), 800);
         } else {
           // Fallback: go to login tab with username prefilled
           setTimeout(() => {

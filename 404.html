@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jenni AI — Redirecting</title>
+  <style>
+    body { background: #050811; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; text-align: center; }
+    .card { background: #0d1117; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 32px 24px; max-width: 440px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+    h2 { color: #38bdf8; margin-top: 0; }
+    p { color: #94a3b8; font-size: 14px; line-height: 1.6; }
+    .btn { display: inline-block; background: #38bdf8; color: #040814; font-weight: 600; padding: 12px 24px; border-radius: 8px; text-decoration: none; margin-top: 16px; transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.9; }
+  </style>
+  <script>
+    (function() {
+      var p = window.location.pathname;
+      var repo = "/jenni_ai/";
+      var target = repo;
+      
+      if (p.indexOf("dashboard") !== -1 || p.indexOf("/app") !== -1) {
+        target = repo + "frontend/dashboard.html";
+      } else if (p.indexOf("login") !== -1) {
+        target = repo + "frontend/login.html";
+      } else if (p.indexOf("ad") !== -1 || p.indexOf("trailer") !== -1) {
+        target = repo + "frontend/ad_video.html";
+      }
+      
+      window.location.replace(target);
+    })();
+  </script>
+</head>
+<body>
+  <div class="card">
+    <h2>Connecting to Jenni AI...</h2>
+    <p>Redirecting you to the appropriate application interface.</p>
+    <a href="/jenni_ai/frontend/dashboard.html" class="btn">Open Dashboard</a>
+  </div>
+</body>
+</html>

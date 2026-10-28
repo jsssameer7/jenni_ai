@@ -1,3 +1,18 @@
+
+function redirectToLogin() {
+  const isGH = window.location.hostname.endsWith('github.io');
+  if (isGH) {
+    // In GitHub Pages demo mode, supply demo token so user can explore dashboard UI
+    if (!localStorage.getItem("jenni_session_token")) {
+      localStorage.setItem("jenni_session_token", "demo-token-gh-pages");
+      localStorage.setItem("jenni_user", JSON.stringify({username: "Admin", display_name: "Admin (Demo)"}));
+      return;
+    }
+    window.location.replace("login.html");
+  } else {
+    redirectToLogin();
+  }
+}
 // Jenni AI — Your Personal Assistant (Frontend Client)
 
 let currentSessionId = "default";
@@ -39,7 +54,7 @@ async function handleLogout() {
   localStorage.removeItem("jenni_session_token");
   localStorage.removeItem("jenni_user");
   localStorage.removeItem("jenni_token");
-  window.location.replace("/login");
+  redirectToLogin();
 }
 
 function updateUserInfoUI() {
@@ -73,7 +88,7 @@ async function apiFetch(url, options = {}) {
     const res = await fetch(url, { ...options, headers });
     if (res.status === 401) {
       localStorage.removeItem("jenni_session_token");
-      window.location.replace("/login");
+      redirectToLogin();
     }
     return res;
   } catch (e) {
@@ -86,7 +101,7 @@ async function apiFetch(url, options = {}) {
 document.addEventListener("DOMContentLoaded", async () => {
   const token = getSessionToken();
   if (!token) {
-    window.location.replace("/login");
+    redirectToLogin();
     return;
   }
 
