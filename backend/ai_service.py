@@ -108,11 +108,40 @@ class AIService:
         search_match = re.search(r"(?:find|search(?: for)?|locate)\s+(?:file|files|document|documents)?\s*(?:named|called)?\s*([a-zA-Z0-9_\-\.\*]+)", text_lower)
         if search_match and len(search_match.group(1)) > 1:
             query = search_match.group(1).strip()
-            if query not in ["the", "me", "a", "an", "my"]:
+            if query not in ["the", "me", "a", "an", "my", "code", "in", "content", "logic"]:
                 files = file_service.search_files(query=query, max_results=5)
                 return ("file_search", {"query": query, "files": files})
 
-        # 4. Open Application Intent (Full Access to ANY Windows 11 PC application)
+        # 3B. Workspace Code & Logic Content Search Intent
+        content_match = re.search(r"(?:search code|find code|find logic|search content|find calculation|search for calculation|grep)\s+(?:in|for|about)?\s*['\"]?([^'\"\r\n]+)['\"]?", text_lower)
+        if content_match:
+            code_query = content_match.group(1).strip()
+            if len(code_query) > 1:
+                matches = file_service.search_content(query=code_query, max_results=8)
+                return ("content_search", {"query": code_query, "matches": matches})
+
+        # 4. Natural Language System Automation (NLP System Control Actions)
+        if any(w in text_lower for w in ["mute", "unmute"]):
+            res = pc_control_service.system_control("volume_mute")
+            return ("system_control", {"action": "system_control", "target": "volume_mute", **res})
+
+        if "volume up" in text_lower or "increase volume" in text_lower:
+            res = pc_control_service.system_control("volume_up")
+            return ("system_control", {"action": "system_control", "target": "volume_up", **res})
+
+        if "volume down" in text_lower or "decrease volume" in text_lower or "lower volume" in text_lower:
+            res = pc_control_service.system_control("volume_down")
+            return ("system_control", {"action": "system_control", "target": "volume_down", **res})
+
+        if "lock pc" in text_lower or "lock screen" in text_lower or "lock workstation" in text_lower:
+            res = pc_control_service.system_control("lock")
+            return ("system_control", {"action": "system_control", "target": "lock", **res})
+
+        if "task manager" in text_lower or "taskmgr" in text_lower:
+            res = pc_control_service.system_control("task manager")
+            return ("system_control", {"action": "system_control", "target": "task manager", **res})
+
+        # 5. Open Application Intent (Full Access to ANY Windows 11 PC application)
         open_match = re.search(r"^(?:please\s+)?(?:open|launch|start|run)\s+(?:the\s+)?([a-zA-Z0-9\s_\-\.\+]+)$", text_lower)
         if open_match:
             app_raw = open_match.group(1).strip()
@@ -357,6 +386,10 @@ class AIService:
                 executed_action = {"type": "website_opened", "data": intent_data}
             elif intent_type == "file_search":
                 executed_action = {"type": "file_search", "data": intent_data}
+            elif intent_type == "content_search":
+                executed_action = {"type": "content_search", "data": intent_data}
+            elif intent_type == "system_control":
+                executed_action = {"type": "system_control", "data": intent_data}
             elif intent_type == "generate_image":
                 img_res = await image_service.generate_image(intent_data["prompt"])
                 executed_action = {"type": "image_generated", "data": img_res}
@@ -442,6 +475,19 @@ class AIService:
             elif executed_action and executed_action.get("type") == "website_opened":
                 ai_reply = executed_action["data"].get("message", "Website opened successfully in your browser.")
                 model_used = "Jenni System Controller"
+            elif executed_action and executed_action.get("type") == "system_control":
+                ai_reply = f"⚡ **System Automation Executed**: {executed_action['data'].get('message', 'System control executed.')}"
+                model_used = "Jenni System Controller"
+            elif executed_action and executed_action.get("type") == "content_search":
+                matches = executed_action["data"].get("matches", [])
+                q = executed_action["data"].get("query", "")
+                if matches:
+                    ai_reply = f"### 🔍 Found {len(matches)} Code Matches in Workspace for: **`{q}`**\n\n"
+                    for m in matches:
+                        ai_reply += f"- **`{m['filename']}`** (Line {m['line_number']}):\n```\n{m['snippet']}\n```\n"
+                else:
+                    ai_reply = f"No code snippets found in workspace matching **`{q}`**."
+                model_used = "Jenni Workspace Indexer"
             else:
                 # Comprehensive Technical Explainer
                 ai_reply = AIService._explain_knowledge(clean_user_msg)

@@ -56,7 +56,7 @@ class FileService:
                 continue
             try:
                 for entry in root.rglob("*"):
-                    # Avoid traversing deeply into hidden or massive directories like venv, node_modules, .git
+                    # Avoid traversing deeply into ignored directories
                     parts = entry.parts
                     if any(ignored in parts for ignored in ["venv", "node_modules", ".git", ".ollama", "__pycache__", "AppData"]):
                         continue
@@ -95,6 +95,64 @@ class FileService:
         return results
 
     @staticmethod
+    def search_content(
+        query: str,
+        folder: Optional[str] = None,
+        extensions: Optional[List[str]] = None,
+        max_results: int = 25
+    ) -> List[Dict[str, Any]]:
+        """
+        Search inside code & document files for logic, functions, and semantic text matches.
+        Supports .py, .js, .html, .css, .c, .java, .json, .md, .txt.
+        """
+        valid_exts = extensions or [".py", ".js", ".html", ".css", ".c", ".java", ".json", ".md", ".txt"]
+        clean_terms = [t.strip().lower() for t in query.split() if len(t.strip()) > 2]
+        if not clean_terms:
+            clean_terms = [query.strip().lower()]
+
+        roots = [Path(folder).resolve()] if folder and Path(folder).is_dir() else settings.approved_directories
+        matches = []
+
+        for root in roots:
+            if not root.exists():
+                continue
+            try:
+                for entry in root.rglob("*"):
+                    if any(ig in entry.parts for ig in ["venv", "node_modules", ".git", ".ollama", "__pycache__", "AppData"]):
+                        continue
+                    if not entry.is_file() or entry.suffix.lower() not in valid_exts:
+                        continue
+                    # Skip huge binary or minified files (> 2MB)
+                    try:
+                        if entry.stat().st_size > 2 * 1024 * 1024:
+                            continue
+                        with open(entry, "r", encoding="utf-8", errors="ignore") as f:
+                            lines = f.readlines()
+
+                        for idx, line in enumerate(lines):
+                            line_lower = line.lower()
+                            if any(term in line_lower for term in clean_terms):
+                                snippet_start = max(0, idx - 1)
+                                snippet_end = min(len(lines), idx + 2)
+                                snippet = "".join(lines[snippet_start:snippet_end]).strip()
+
+                                matches.append({
+                                    "filename": entry.name,
+                                    "path": str(entry.resolve()),
+                                    "line_number": idx + 1,
+                                    "snippet": snippet,
+                                    "matched_line": line.strip()
+                                })
+                                if len(matches) >= max_results:
+                                    return matches
+                    except Exception:
+                        continue
+            except Exception:
+                continue
+
+        return matches
+
+    @staticmethod
     def open_or_reveal_file(file_path: str, reveal: bool = False) -> Dict[str, Any]:
         """Safely open the file or show it selected in Windows Explorer."""
         p = Path(file_path)
@@ -107,11 +165,9 @@ class FileService:
 
         try:
             if reveal:
-                # Open Explorer with file highlighted
                 subprocess.Popen(["explorer.exe", f"/select,{str(p.resolve())}"])
                 return {"success": True, "message": f"Revealed {p.name} in Windows Explorer."}
             else:
-                # Open with Windows default application
                 os.startfile(str(p.resolve()))
                 return {"success": True, "message": f"Opened {p.name}."}
         except Exception as e:

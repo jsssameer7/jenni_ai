@@ -171,6 +171,42 @@
             </div>
 
             <!-- Suggested Quick Actions -->
+            <!-- Modern Quick Launch / Whitelist Dock -->
+            <div class="quick-dock" id="quick-dock">
+              <button class="dock-btn" onclick="launchApp('vscode')" title="Launch Visual Studio Code">
+                <span class="dock-icon">💻</span>
+                <span>VS Code</span>
+              </button>
+              <button class="dock-btn" onclick="launchApp('terminal')" title="Launch Windows Terminal">
+                <span class="dock-icon">⚡</span>
+                <span>Terminal</span>
+              </button>
+              <button class="dock-btn" onclick="launchApp('browser')" title="Open Default Web Browser">
+                <span class="dock-icon">🌐</span>
+                <span>Browser</span>
+              </button>
+              <button class="dock-btn" onclick="launchApp('whatsapp')" title="Launch Native WhatsApp Desktop">
+                <span class="dock-icon">📱</span>
+                <span>WhatsApp</span>
+              </button>
+              <button class="dock-btn" onclick="launchApp('explorer')" title="Open Windows File Explorer">
+                <span class="dock-icon">📁</span>
+                <span>Files</span>
+              </button>
+              <button class="dock-btn" onclick="launchApp('calculator')" title="Open Calculator">
+                <span class="dock-icon">🔢</span>
+                <span>Calc</span>
+              </button>
+              <button class="dock-btn" onclick="triggerSystemControl('volume_mute')" title="Toggle System Audio Mute">
+                <span class="dock-icon">🔇</span>
+                <span>Mute</span>
+              </button>
+              <button class="dock-btn" onclick="triggerSystemControl('lock')" title="Lock Windows 11 WorkStation">
+                <span class="dock-icon">🔒</span>
+                <span>Lock PC</span>
+              </button>
+            </div>
+
             <div class="quick-suggestions" id="quick-suggestions">
               <button class="suggestion-chip" data-query="how to run">🚀 How to Run Jenni AI</button>
               <button class="suggestion-chip" data-query="open whatsapp">📱 Open WhatsApp</button>
@@ -209,27 +245,78 @@
             <p>Control approved applications and monitor Windows 11 system metrics safely.</p>
           </div>
 
-          <!-- Hardware Metrics Cards -->
+          <!-- Hardware Metrics Cards (Live Streaming SVG Rings) -->
           <div class="metrics-grid">
-            <div class="metric-card">
-              <div class="metric-title">CPU Utilization</div>
-              <div class="metric-val" id="metric-cpu">-- %</div>
-              <div class="progress-bar"><div class="fill" id="fill-cpu"></div></div>
+            <!-- CPU Circular Ring -->
+            <div class="metric-card ring-card">
+              <div class="ring-wrapper">
+                <svg class="metric-svg-ring" viewBox="0 0 100 100">
+                  <circle class="ring-track" cx="50" cy="50" r="40" stroke-width="7"></circle>
+                  <circle class="ring-indicator" id="ring-cpu-circle" cx="50" cy="50" r="40" stroke-width="7" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
+                </svg>
+                <div class="ring-center">
+                  <span class="ring-val" id="metric-cpu">--%</span>
+                  <span class="ring-lbl">CPU</span>
+                </div>
+              </div>
+              <div class="metric-meta">
+                <strong>CPU Utilization</strong>
+                <span id="metric-cpu-details">Win32 C Native Bridge</span>
+              </div>
             </div>
-            <div class="metric-card">
-              <div class="metric-title">System RAM (16 GB)</div>
-              <div class="metric-val" id="metric-ram">-- GB</div>
-              <div class="progress-bar"><div class="fill" id="fill-ram"></div></div>
+
+            <!-- RAM Circular Ring -->
+            <div class="metric-card ring-card">
+              <div class="ring-wrapper">
+                <svg class="metric-svg-ring" viewBox="0 0 100 100">
+                  <circle class="ring-track" cx="50" cy="50" r="40" stroke-width="7"></circle>
+                  <circle class="ring-indicator" id="ring-ram-circle" cx="50" cy="50" r="40" stroke-width="7" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
+                </svg>
+                <div class="ring-center">
+                  <span class="ring-val" id="metric-ram-pct">--%</span>
+                  <span class="ring-lbl">RAM</span>
+                </div>
+              </div>
+              <div class="metric-meta">
+                <strong>Memory (RAM)</strong>
+                <span id="metric-ram">-- / 16.0 GB</span>
+              </div>
             </div>
-            <div class="metric-card">
-              <div class="metric-title">GPU VRAM (RTX 3050 4GB)</div>
-              <div class="metric-val" id="metric-gpu">-- MB</div>
-              <div class="progress-bar"><div class="fill" id="fill-gpu"></div></div>
+
+            <!-- GPU Circular Ring -->
+            <div class="metric-card ring-card">
+              <div class="ring-wrapper">
+                <svg class="metric-svg-ring" viewBox="0 0 100 100">
+                  <circle class="ring-track" cx="50" cy="50" r="40" stroke-width="7"></circle>
+                  <circle class="ring-indicator" id="ring-gpu-circle" cx="50" cy="50" r="40" stroke-width="7" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
+                </svg>
+                <div class="ring-center">
+                  <span class="ring-val" id="metric-gpu-pct">--%</span>
+                  <span class="ring-lbl">GPU</span>
+                </div>
+              </div>
+              <div class="metric-meta">
+                <strong>GPU VRAM</strong>
+                <span id="metric-gpu">RTX 3050 (4 GB)</span>
+              </div>
             </div>
-            <div class="metric-card">
-              <div class="metric-title">C: Drive Storage</div>
-              <div class="metric-val" id="metric-disk">-- GB Free</div>
-              <div class="progress-bar"><div class="fill" id="fill-disk"></div></div>
+
+            <!-- Storage Circular Ring -->
+            <div class="metric-card ring-card">
+              <div class="ring-wrapper">
+                <svg class="metric-svg-ring" viewBox="0 0 100 100">
+                  <circle class="ring-track" cx="50" cy="50" r="40" stroke-width="7"></circle>
+                  <circle class="ring-indicator" id="ring-disk-circle" cx="50" cy="50" r="40" stroke-width="7" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
+                </svg>
+                <div class="ring-center">
+                  <span class="ring-val" id="metric-disk-pct">--%</span>
+                  <span class="ring-lbl">DISK</span>
+                </div>
+              </div>
+              <div class="metric-meta">
+                <strong>C: System Drive</strong>
+                <span id="metric-disk">-- GB Free</span>
+              </div>
             </div>
           </div>
 
@@ -563,5 +650,6 @@ Body:
 
   <script src="app.js"></script>
   <script src="/static/app.js"></script>
+  <div class="toast-container" id="toast-container"></div>
 </body>
 </html>

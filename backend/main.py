@@ -1,7 +1,9 @@
 import os
 from pathlib import Path
 from typing import Dict, Any, Optional
-from fastapi import FastAPI, Depends, HTTPException, Query, BackgroundTasks, status, Request
+from fastapi import FastAPI, Depends, HTTPException, Query, BackgroundTasks, status, Request, WebSocket, WebSocketDisconnect
+import asyncio
+from typing import List
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
@@ -84,6 +86,15 @@ class MemoryRequest(BaseModel):
 
 class AppRequest(BaseModel):
     app_name: str
+
+class SystemControlRequest(BaseModel):
+    target: str
+    value: Optional[Any] = None
+
+class ContentSearchRequest(BaseModel):
+    query: str
+    folder: Optional[str] = None
+    max_results: Optional[int] = 20
 
 class WebsiteRequest(BaseModel):
     url: str
@@ -199,6 +210,29 @@ async def get_system_status():
         "token": settings.AUTH_TOKEN
     }
 
+
+# --- Real-Time WebSocket Telemetry & Bidirectional Streaming Bridge ---
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        if websocket in self.active_connections:
+            self.active_connections.remove(websocket)
+
+    async def broadcast(self, message: dict):
+        for connection in list(self.active_connections):
+            try:
+                await connection.send_json(message)
+            except Exception:
+                self.disconnect(connection)
+
+ws_manager = ConnectionManager()
+
 # 1. Chat Endpoints
 @app.post("/api/chat", dependencies=[Depends(verify_auth)])
 async def chat_endpoint(req: ChatRequest):
@@ -253,7 +287,40 @@ async def get_pc_metrics():
 
 @app.post("/api/pc/app", dependencies=[Depends(verify_auth)])
 async def launch_app(req: AppRequest):
-    return pc_control_service.open_app(req.app_name)
+    # Non-blocking async execution
+    res = await pc_control_service.launch_application_async(req.app_name)
+    await ws_manager.broadcast({"type": "action_executed", "action": "open_app", "data": res})
+    return res
+
+@app.post("/api/pc/system-control", dependencies=[Depends(verify_auth)])
+async def execute_system_control(req: SystemControlRequest):
+    res = pc_control_service.system_control(req.target, req.value)
+    await ws_manager.broadcast({"type": "system_control", "data": res})
+    return res
+
+@app.websocket("/ws/telemetry")
+async def websocket_telemetry_endpoint(websocket: WebSocket):
+    await ws_manager.connect(websocket)
+    try:
+        init_metrics = pc_control_service.get_system_status()
+        await websocket.send_json({"type": "telemetry", "data": init_metrics})
+        while True:
+            try:
+                msg = await asyncio.wait_for(websocket.receive_json(), timeout=2.0)
+                if msg.get("type") == "ping":
+                    await websocket.send_json({"type": "pong"})
+                elif msg.get("type") == "command":
+                    cmd = msg.get("data", "")
+                    if cmd:
+                        res = await pc_control_service.launch_application_async(cmd)
+                        await websocket.send_json({"type": "command_result", "data": res})
+            except asyncio.TimeoutError:
+                metrics = pc_control_service.get_system_status()
+                await websocket.send_json({"type": "telemetry", "data": metrics})
+    except WebSocketDisconnect:
+        ws_manager.disconnect(websocket)
+    except Exception:
+        ws_manager.disconnect(websocket)
 
 @app.post("/api/pc/website", dependencies=[Depends(verify_auth)])
 async def open_web(req: WebsiteRequest):
@@ -268,6 +335,14 @@ async def get_action_audit_logs():
     return get_recent_action_logs(limit=30)
 
 # 4. File Management & Search
+@app.get("/api/files/content-search", dependencies=[Depends(verify_auth)])
+async def search_file_content(
+    query: str = Query(..., description="Keyword or function name to search inside code"),
+    folder: Optional[str] = Query(None, description="Optional folder to restrict search"),
+    max_results: int = Query(20, description="Max results")
+):
+    return file_service.search_content(query=query, folder=folder, max_results=max_results)
+
 @app.get("/api/files/search", dependencies=[Depends(verify_auth)])
 async def search_files(
     query: str = Query("", description="Filename keyword to search for"),

@@ -1,4 +1,148 @@
 
+// --- Modern Toast Notification System ---
+function showToastNotification(title, message, type = "success") {
+  const container = document.getElementById("toast-container");
+  if (!container) return;
+
+  const card = document.createElement("div");
+  card.className = `toast-card ${type}`;
+
+  const icon = type === "success" ? "⚡" : (type === "warning" ? "⚠️" : "❌");
+  card.innerHTML = `
+    <div class="toast-icon">${icon}</div>
+    <div class="toast-body">
+      <div class="toast-title">${title}</div>
+      <div class="toast-desc">${message}</div>
+    </div>
+    <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
+  `;
+
+  container.appendChild(card);
+  setTimeout(() => {
+    card.style.opacity = "0";
+    card.style.transform = "translateY(15px) scale(0.95)";
+    setTimeout(() => card.remove(), 250);
+  }, 4000);
+}
+
+// --- Live SVG Metric Rings Renderer ---
+function setRingGauge(circleId, pct, valId = null, valText = null) {
+  const circle = document.getElementById(circleId);
+  if (!circle) return;
+
+  const circumference = 251.2;
+  const clamped = Math.max(0, Math.min(100, pct));
+  const offset = circumference - (clamped / 100) * circumference;
+  circle.style.strokeDashoffset = offset;
+
+  // Dynamic Color Transition: Cyan -> Amber -> Red
+  let color = "#00e5ff"; // Cyan (< 60%)
+  if (clamped >= 85) {
+    color = "#ff1744"; // Red (High Load)
+  } else if (clamped >= 60) {
+    color = "#ffab00"; // Amber (Moderate Load)
+  }
+  circle.style.stroke = color;
+
+  if (valId) {
+    const el = document.getElementById(valId);
+    if (el) el.textContent = valText !== null ? valText : `${Math.round(clamped)}%`;
+  }
+}
+
+function renderTelemetry(d) {
+  if (!d) return;
+
+  // CPU Ring
+  const cpuPct = d.cpu_percent || 0;
+  setRingGauge("ring-cpu-circle", cpuPct, "metric-cpu", `${Math.round(cpuPct)}%`);
+  const cpuSub = document.getElementById("metric-cpu-details");
+  if (cpuSub) cpuSub.textContent = d.engine || "Win32 C Native Bridge";
+
+  // RAM Ring
+  const ramPct = d.ram_percent || 0;
+  setRingGauge("ring-ram-circle", ramPct, "metric-ram-pct", `${Math.round(ramPct)}%`);
+  const ramSub = document.getElementById("metric-ram");
+  if (ramSub) ramSub.textContent = `${d.ram_used_gb || "--"} / ${d.ram_total_gb || "16.0"} GB`;
+
+  // GPU Ring
+  let gpuPct = 0;
+  if (d.gpu && d.gpu.total_vram_mb) {
+    gpuPct = Math.round((d.gpu.used_vram_mb / d.gpu.total_vram_mb) * 100);
+    const gpuSub = document.getElementById("metric-gpu");
+    if (gpuSub) gpuSub.textContent = `${d.gpu.used_vram_mb} MB / ${Math.round(d.gpu.total_vram_mb / 1024)}GB`;
+  }
+  setRingGauge("ring-gpu-circle", gpuPct, "metric-gpu-pct", `${gpuPct}%`);
+
+  // Disk Ring
+  const diskPct = d.disk_percent || 0;
+  setRingGauge("ring-disk-circle", diskPct, "metric-disk-pct", `${Math.round(diskPct)}%`);
+  const diskSub = document.getElementById("metric-disk");
+  if (diskSub) diskSub.textContent = `${d.disk_free_gb || "--"} GB Free`;
+}
+
+// --- WebSocket Live Telemetry Streaming ---
+let telemetrySocket = null;
+function initWebSocketTelemetry() {
+  const isGH = window.location.hostname.endsWith('github.io');
+  if (isGH) return; // Simulated locally on GitHub Pages
+
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  const wsUrl = `${protocol}//${window.location.host}/ws/telemetry`;
+
+  try {
+    telemetrySocket = new WebSocket(wsUrl);
+
+    telemetrySocket.onopen = () => {
+      console.log("⚡ Connected to Jenni AI Real-Time WebSocket Telemetry Bridge");
+    };
+
+    telemetrySocket.onmessage = (event) => {
+      try {
+        const payload = JSON.parse(event.data);
+        if (payload.type === "telemetry") {
+          renderTelemetry(payload.data);
+        } else if (payload.type === "action_executed") {
+          showToastNotification("Application Launched", payload.data?.message || "App opened", "success");
+        } else if (payload.type === "system_control") {
+          showToastNotification("System Action", payload.data?.message || "Control executed", "success");
+        }
+      } catch (e) {}
+    };
+
+    telemetrySocket.onclose = () => {
+      setTimeout(initWebSocketTelemetry, 6000);
+    };
+
+    telemetrySocket.onerror = () => {
+      telemetrySocket.close();
+    };
+  } catch (e) {
+    console.warn("WebSocket telemetry bridge not initialized:", e);
+  }
+}
+
+// --- System Control Trigger ---
+async function triggerSystemControl(target) {
+  showToastNotification("Executing Action...", `Triggered: ${target}`, "warning");
+  try {
+    const res = await apiFetch("/api/pc/system-control", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ target: target })
+    });
+    const d = await res.json();
+    if (res.ok) {
+      showToastNotification("System Automation", d.message || "Executed successfully", "success");
+    } else {
+      showToastNotification("Error", d.detail || "Action failed", "error");
+    }
+  } catch (e) {
+    showToastNotification("Connection Error", e.message || "Failed to reach server", "error");
+  }
+}
+
+
 // --- Jenni Multi-Model Intelligence Engine (Gemini / ChatGPT / Ollama / Knowledge) ---
 
 function cleanSpokenText(mdText) {
@@ -509,6 +653,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupImageStudioHandlers();
   setupModals();
   setupAIModelHandlers();
+  initWebSocketTelemetry();
 
   // Load initial data
   await loadSystemStatus();
@@ -902,21 +1047,7 @@ async function loadPCMetrics() {
     const res = await apiFetch("/api/pc/status");
     if (res && res.ok) {
       const d = await res.json();
-
-      document.getElementById("metric-cpu").textContent = `${d.cpu_percent}%`;
-      document.getElementById("fill-cpu").style.width = `${Math.min(d.cpu_percent, 100)}%`;
-
-      document.getElementById("metric-ram").textContent = `${d.ram_used_gb} / ${d.ram_total_gb} GB (${d.ram_percent}%)`;
-      document.getElementById("fill-ram").style.width = `${d.ram_percent}%`;
-
-      if (d.gpu) {
-        document.getElementById("metric-gpu").textContent = `${d.gpu.used_vram_mb} / ${d.gpu.total_vram_mb} MB`;
-        const gpuPct = (d.gpu.used_vram_mb / (d.gpu.total_vram_mb || 4096)) * 100;
-        document.getElementById("fill-gpu").style.width = `${Math.min(gpuPct, 100)}%`;
-      }
-
-      document.getElementById("metric-disk").textContent = `${d.disk_free_gb} GB Free (${100 - d.disk_percent}%)`;
-      document.getElementById("fill-disk").style.width = `${d.disk_percent}%`;
+      renderTelemetry(d);
     }
 
     // Also load recent action logs
@@ -937,6 +1068,7 @@ async function loadPCMetrics() {
 }
 
 async function launchApp(appName) {
+  showToastNotification("Launching App...", `Opening ${appName.toUpperCase()}...`, "warning");
   try {
     const res = await apiFetch("/api/pc/app", {
       method: "POST",
@@ -945,13 +1077,13 @@ async function launchApp(appName) {
     });
     const d = await res.json();
     if (!res.ok) {
-      alert(d.detail || d.message || `Could not launch ${appName}`);
+      showToastNotification("Launch Failed", d.detail || d.message || `Could not launch ${appName}`, "error");
       return;
     }
-    alert(d.message || `Launched ${appName} successfully.`);
+    showToastNotification("Application Launched", d.message || `Launched ${appName} successfully.`, "success");
     loadPCMetrics();
   } catch (e) {
-    alert("Error launching app: " + (e.message || "Server not reachable"));
+    showToastNotification("Connection Error", "Error launching app: " + (e.message || "Server not reachable"), "error");
   }
 }
 
